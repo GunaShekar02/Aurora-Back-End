@@ -1,0 +1,14 @@
+{
+  "name": "aurora-back-end",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/GunaShekar02/Aurora-Back-End.git",
+  "author": "Guna Shekar <gunashekherproddatoori@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+  	"start": "node src/index.js" 
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
