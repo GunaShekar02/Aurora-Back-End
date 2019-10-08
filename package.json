@@ -31,7 +31,9 @@
     "prettier": "^1.18.2"
   },
   "husky": {
-    "pre-commit": "yarn lint-staged"
+    "hooks": {
+      "pre-commit": "yarn lint-staged"
+    }
   },
   "eslintConfig": {
     "extends": [

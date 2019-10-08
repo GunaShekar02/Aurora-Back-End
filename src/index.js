@@ -12,15 +12,18 @@ const app = express();
 app.use(cors());
 
 const server = new ApolloServer({
-	typeDefs,
-	resolvers,
-	context: (req) => provideContext(req),
+  typeDefs,
+  resolvers,
+  context: req => provideContext(req),
 });
 
 const port = process.env.PORT || 3001;
 
-app.get('/api', (req,res) => res.send("it is working."));
+app.get('/api', (req, res) => res.send('it is working.'));
 
-server.applyMiddleware({app, path: '/api/graphql'});
+server.applyMiddleware({ app, path: '/api/graphql' });
 
-app.listen(port, () => console.log(`API server ready at http://localhost:${port}${server.graphqlPath}`));
+app.listen(port, () =>
+  // eslint-disable-next-line no-console
+  console.log(`API server ready at http://localhost:${port}${server.graphqlPath}`)
+);
