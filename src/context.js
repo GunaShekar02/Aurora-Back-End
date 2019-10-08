@@ -8,6 +8,8 @@ const provideContext = (request) => {
 	var payload = {
 		isValid: false,
 		token: null,
+    email: null,
+    id: null,
 	};
 	let authHeader = req.headers.authorization || null;
 
