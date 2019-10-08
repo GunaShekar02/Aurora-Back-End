@@ -1,9 +1,9 @@
-const { gql } = require('apollo-server');
+const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
   type Query {
-    events(userId: ID!): [Event!]
-    user(email: String!): User
+    events: [Event!]
+    user: User
   }
 
   type Event {
@@ -15,6 +15,7 @@ const typeDefs = gql`
 
   type User {
     id: ID
+    email: String
     name: String
     college: String
     phone: String
@@ -27,7 +28,7 @@ const typeDefs = gql`
     id: ID
     name: String
     event: Event
-    members: [Users!]!
+    members: [User!]!
     paymentStatus: Boolean
   }
 
@@ -50,3 +51,5 @@ const typeDefs = gql`
     user: User
   }
 `;
+
+module.exports = typeDefs;
