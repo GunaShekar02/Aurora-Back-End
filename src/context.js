@@ -1,22 +1,21 @@
 const jwt = require('jsonwebtoken');
-require('dotenv').config();
+const { jwtSecret } = require('./utils/config');
 
-const secret = process.env.JWT_TOKEN;
-
-const provideContext = request => {
+const provideContext = (request, database) => {
   const { req } = request;
   const payload = {
     isValid: false,
     token: null,
     email: null,
     id: null,
+    db: database,
   };
   const authHeader = req.headers.authorization || null;
 
   if (authHeader) {
     const token = authHeader.replace('bearer ', '');
 
-    jwt.verify(token, secret, (err, decoded) => {
+    jwt.verify(token, jwtSecret, (err, decoded) => {
       if (!err) {
         payload.isValid = true;
         payload.token = token;
