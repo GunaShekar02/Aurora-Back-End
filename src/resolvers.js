@@ -1,16 +1,12 @@
-const { AuthenticationError } = require('apollo-server-express');
+const user = require('./resolvers/query/user');
+const signup = require('./resolvers/mutation/signup');
 
 const resolvers = {
   Query: {
-    user: (_, __, context) => {
-      const { isValid, email, id } = context;
-
-      if (isValid) {
-        return { email, id };
-      }
-
-      throw new AuthenticationError('Must Authenticate');
-    },
+    user,
+  },
+  Mutation: {
+    signup,
   },
 };
 
