@@ -34,7 +34,13 @@ const typeDefs = gql`
 
   type Mutation {
     login(email: String!, password: String!): String
-    signup(email: String!, password: String!, name: String!, college: String!, phone: String!): MutationResponse
+    signup(
+      email: String!
+      password: String!
+      name: String!
+      college: String!
+      phone: String!
+    ): MutationResponse
     verify(email: String!, code: String!): MutationResponse
     eventRegister(userId: ID!, eventId: ID!): MutationResponse
     sendInvite(teamId: ID!, email: String!): MutationResponse
