@@ -3,33 +3,34 @@ const { gql } = require('apollo-server-express');
 const typeDefs = gql`
   type Query {
     events: [Event!]
-    user: User
+    user: User!
   }
 
   type Event {
-    id: ID
-    name: String
-    maxSize: Int
-    fee: Int
+    id: ID!
+    name: String!
+    maxSize: Int!
+    fee: Int!
   }
 
   type User {
-    id: ID
-    email: String
-    name: String
-    college: String
-    phone: String
-    isVerified: Boolean
-    Accommodation: Boolean
+    id: ID!
+    email: String!
+    name: String!
+    college: String!
+    phone: String!
+    isVerified: Boolean!
+    accommodation: Boolean!
     teams: [Team!]
+    teamInvitations: [Team!]
   }
 
   type Team {
-    id: ID
-    name: String
-    event: Event
+    id: ID!
+    name: String!
+    event: Event!
     members: [User!]!
-    paymentStatus: Boolean
+    paymentStatus: Boolean!
   }
 
   type Mutation {
