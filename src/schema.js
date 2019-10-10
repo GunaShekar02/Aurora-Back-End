@@ -21,8 +21,8 @@ const typeDefs = gql`
     phone: String!
     isVerified: Boolean!
     accommodation: Boolean!
-    teams: [Team!]
-    teamInvitations: [Team!]
+    teams: [Team!]!
+    teamInvitations: [Team!]!
   }
 
   type Team {
@@ -34,7 +34,7 @@ const typeDefs = gql`
   }
 
   type Mutation {
-    login(email: String!, password: String!): String
+    login(email: String!, password: String!): String!
     signup(
       email: String!
       password: String!

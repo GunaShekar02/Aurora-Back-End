@@ -7,7 +7,6 @@ const { jwtSecret } = require('../../utils/config');
 const login = async (_, args, context) => {
   const { db } = context;
   const { email, password } = args;
-
   const user = await db
     .collection('users')
     .find({ email })

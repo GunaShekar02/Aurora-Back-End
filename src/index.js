@@ -27,7 +27,7 @@ MongoClient.connect(config.dbHost, {
     const server = new ApolloServer({
       typeDefs,
       resolvers,
-      context: req => provideContext(req, db),
+      context: req => provideContext(req, db, client),
     });
 
     const port = config.port || 3001;
@@ -37,11 +37,9 @@ MongoClient.connect(config.dbHost, {
     server.applyMiddleware({ app, path: '/api/graphql' });
 
     app.listen(port, () =>
-      // eslint-disable-next-line no-console
       console.log(`API server ready at http://localhost:${port}${server.graphqlPath}`)
     );
   })
   .catch(err => {
-    // eslint-disable-next-line no-console
     console.log('I caught something', err);
   });
