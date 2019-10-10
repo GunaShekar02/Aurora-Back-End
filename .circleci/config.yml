@@ -1,4 +1,4 @@
-version: 1.0
+version: 2.1
 
 workflows:
   test:
@@ -12,21 +12,21 @@ jobs:
     steps:
       - checkout
 
-      - restore_cache
-        keys:
-          - v1-dependencies-{{ checksum "package.json" }}
-          # fallback to latest cache if exact match not found
-          - v1-dependencies-
+      - restore_cache:
+         keys:
+           - v1-dependencies-{{ checksum "package.json" }}
+           # fallback to latest cache if exact match not found
+           - v1-dependencies-
 
       - run:
-        name: Install dependencies
-        command: yarn
+         name: Install dependencies
+         command: yarn
 
       - run:
-        name: Run lint tests
-        command: yarn lint:ci
+         name: Run lint tests
+         command: yarn lint:ci
 
-      - save_cache
-        paths:
-          - node_modules
-        key: v1-dependencies-{{ checksum "package.json" }}
+      - save_cache:
+         key: v1-dependencies-{{ checksum "package.json" }}
+         paths:
+           - "node_modules"
