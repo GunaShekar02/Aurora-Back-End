@@ -5,8 +5,28 @@ const signup = async (_, args, context) => {
   const { db } = context;
   const { email, password, name, college, phone } = args;
 
+  // const Event = await db.collection('events').insertMany({
+  //   id: 1,
+  //   name: "Event_1",
+  //   maxSize: 3,
+  //   fee: 300
+  // },{
+  //   id: 2,
+  //   name: "Event_2",
+  //   maxSize: 5,
+  //   fee: 500
+  // });
+  // console.log("event created");
+
+  // const Event = await db
+  // .collection('events') 
+  // .find()
+  // .toArray();
+  // console.log(Event);
+
+
   const user = await db
-    .collection('users')
+    .collection('users') 
     .find({ email })
     .toArray();
   if (user.length === 0) {
@@ -24,7 +44,7 @@ const signup = async (_, args, context) => {
     const hash = await bcrypt.hash(password, 10);
 
     const res = await db.collection('users').insertOne({
-      hash,
+      password: hash,
       ...payload,
     });
 
