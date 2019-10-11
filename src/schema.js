@@ -5,12 +5,14 @@ const typeDefs = gql`
     events: [Event!]
     user: User!
   }
+
   type Event {
     id: ID!
     name: String!
     maxSize: Int!
     fee: Int!
   }
+
   type User {
     id: ID!
     email: String!
@@ -22,6 +24,7 @@ const typeDefs = gql`
     teams: [Team!]
     teamInvitations: [Team!]
   }
+
   type Team {
     id: ID!
     name: String!
@@ -29,6 +32,7 @@ const typeDefs = gql`
     members: [User!]!
     paymentStatus: Boolean!
   }
+
   type Mutation {
     login(email: String!, password: String!): String
     signup(
@@ -46,6 +50,7 @@ const typeDefs = gql`
     declineInvite(teamId: ID!): MutationResponse
     pay(teamId: ID!): MutationResponse
   }
+
   type MutationResponse {
     code: String
     success: Boolean!
