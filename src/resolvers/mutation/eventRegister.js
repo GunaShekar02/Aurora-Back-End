@@ -1,4 +1,4 @@
-const { UserInputError } = require('apollo-server-express');
+const { ApolloError } = require('apollo-server-express');
 const ObjectId = require('mongodb').ObjectID;
 
 const eventRegister = async (_, args, context) => {
@@ -8,13 +8,13 @@ const eventRegister = async (_, args, context) => {
   userId = ObjectId(userId);
   eventId = ObjectId(eventId);
   if (isValid) {
-    const User = await db
+    const user = await db
       .collection('users')
       .find({ _id: userId })
       .toArray();
     const updateUser = async session => {
-      const usersCollection = client.db(db.options.authSource).collection('users');
-      const teamsCollection = client.db(db.options.authSource).collection('teams');
+      const usersCollection = db.collection('users');
+      const teamsCollection = db.collection('teams');
 
       session.startTransaction({
         readConcern: { level: 'snapshot' },
@@ -23,13 +23,13 @@ const eventRegister = async (_, args, context) => {
 
       try {
         // eslint-disable-next-line no-undef
-        const Team = await teamsCollection.insertOne({
-          name: User[0].name,
+        const team = await teamsCollection.insertOne({
+          name: user[0].name,
           event: eventId,
           members: userId,
           paymentStatus: false,
         });
-        teamId = Team.ops[0]._id;
+        teamId = team.ops[0]._id;
         await usersCollection.updateOne(
           { _id: userId },
           { $push: { teams: teamId } },
@@ -38,11 +38,11 @@ const eventRegister = async (_, args, context) => {
         try {
           session.commitTransaction();
         } catch (error) {
-          throw new UserInputError('FAiled', error);
+          throw new ApolloError(error);
         }
       } catch (error) {
         session.abortTransaction();
-        throw new UserInputError(error);
+        throw new ApolloError(error);
       }
     };
     const session = client.startSession({
@@ -55,21 +55,21 @@ const eventRegister = async (_, args, context) => {
     try {
       updateUser(session);
     } catch (error) {
-      throw new UserInputError(error);
+      throw new ApolloError(error);
     } finally {
       session.endSession();
     }
     const teamsList = await db
       .collection('teams')
-      .find({ _id: { $in: User[0].teams } })
+      .find({ _id: { $in: user[0].teams } })
       .toArray();
     return {
       code: 200,
       success: true,
       message: 'Event registered successfully',
-      user: { ...User[0], teams: teamsList },
+      user: { ...user[0], teams: teamsList },
     };
   }
-  throw new UserInputError('User is not logged in');
+  throw new ApolloError('User is not logged in');
 };
 module.exports = eventRegister;
