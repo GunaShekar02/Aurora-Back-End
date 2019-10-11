@@ -1,5 +1,5 @@
 const { UserInputError } = require('apollo-server-express');
-let ObjectId = require('mongodb').ObjectID;
+const ObjectId = require('mongodb').ObjectID;
 
 const eventRegister = async (_, args, context) => {
   const { isValid, db, client } = context;
@@ -12,9 +12,9 @@ const eventRegister = async (_, args, context) => {
       .collection('users')
       .find({ _id: userId })
       .toArray();
-    const updateUser = async (session) => {
-      usersCollection = client.db(db.options.authSource).collection('users');
-      teamsCollection = client.db(db.options.authSource).collection('teams');
+    const updateUser = async session => {
+      const usersCollection = client.db(db.options.authSource).collection('users');
+      const teamsCollection = client.db(db.options.authSource).collection('teams');
 
       session.startTransaction({
         readConcern: { level: 'snapshot' },
@@ -22,14 +22,14 @@ const eventRegister = async (_, args, context) => {
       });
 
       try {
-        Team = await teamsCollection.insertOne({
+        // eslint-disable-next-line no-undef
+        const Team = await teamsCollection.insertOne({
           name: User[0].name,
           event: eventId,
           members: userId,
           paymentStatus: false,
         });
         teamId = Team.ops[0]._id;
-        console.log('HII', Team.ops[0]._id);
         await usersCollection.updateOne(
           { _id: userId },
           { $push: { teams: teamId } },
@@ -37,7 +37,6 @@ const eventRegister = async (_, args, context) => {
         );
         try {
           session.commitTransaction();
-          console.log("Transaction committed.");
         } catch (error) {
           throw new UserInputError('FAiled', error);
         }
@@ -46,7 +45,8 @@ const eventRegister = async (_, args, context) => {
         throw new UserInputError(error);
       }
     };
-    const session = client.startSession({defaultTransactionOptions: {
+    const session = client.startSession({
+      defaultTransactionOptions: {
         readConcern: { level: 'local' },
         writeConcern: { w: 'majority' },
         readPreference: 'primary',
@@ -63,7 +63,6 @@ const eventRegister = async (_, args, context) => {
       .collection('teams')
       .find({ _id: { $in: User[0].teams } })
       .toArray();
-    console.log(teamsList);
     return {
       code: 200,
       success: true,

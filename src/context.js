@@ -9,7 +9,7 @@ const provideContext = (request, database, client) => {
     email: null,
     id: null,
     db: database,
-    client: client,
+    client,
   };
   const authHeader = req.headers.authorization || null;
 
