@@ -27,7 +27,7 @@ const eventRegister = async (_, args, context) => {
           {
             name: user[0].name,
             event: eventId,
-            members: userId,
+            members: [userId],
             paymentStatus: false,
           },
           { session }
@@ -35,19 +35,27 @@ const eventRegister = async (_, args, context) => {
         teamId = team.ops[0]._id;
         await usersCollection.updateOne(
           { _id: userId },
-          { $push: { teams: teamId } },
+          { $push: { teams: { teamId, eventId } } },
           { new: true },
           { session }
         );
       });
     } catch (err) {
-      throw new ApolloError('Could not complete Trx ', err);
+      throw new ApolloError('Something went wrong', 'TRX_FAILED');
     }
+    const singleTeam = await db
+      .collection('teams')
+      .find({ _id: teamId })
+      .toArray();
+    const singleEvent = await db
+      .collection('events')
+      .find({ _id: eventId })
+      .toArray();
     return {
       code: 200,
       success: true,
       message: 'User registered successfully',
-      user: { id: userId, ...user[0] },
+      team: { id: teamId, ...singleTeam[0], event: { id: eventId, ...singleEvent[0] } },
     };
   }
   throw new ApolloError('User is not logged in');
