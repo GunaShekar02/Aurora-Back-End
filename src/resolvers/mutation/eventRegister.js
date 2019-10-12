@@ -12,39 +12,6 @@ const eventRegister = async (_, args, context) => {
       .collection('users')
       .find({ _id: userId })
       .toArray();
-    const updateUser = async session => {
-      const usersCollection = db.collection('users');
-      const teamsCollection = db.collection('teams');
-
-      session.startTransaction({
-        readConcern: { level: 'snapshot' },
-        writeConcern: { w: 'majority' },
-      });
-
-      try {
-        // eslint-disable-next-line no-undef
-        const team = await teamsCollection.insertOne({
-          name: user[0].name,
-          event: eventId,
-          members: userId,
-          paymentStatus: false,
-        });
-        teamId = team.ops[0]._id;
-        await usersCollection.updateOne(
-          { _id: userId },
-          { $push: { teams: teamId } },
-          { new: true }
-        );
-        try {
-          session.commitTransaction();
-        } catch (error) {
-          throw new ApolloError(error);
-        }
-      } catch (error) {
-        session.abortTransaction();
-        throw new ApolloError(error);
-      }
-    };
     const session = client.startSession({
       defaultTransactionOptions: {
         readConcern: { level: 'local' },
@@ -53,21 +20,34 @@ const eventRegister = async (_, args, context) => {
       },
     });
     try {
-      updateUser(session);
-    } catch (error) {
-      throw new ApolloError(error);
-    } finally {
-      session.endSession();
+      await session.withTransaction(async () => {
+        const usersCollection = db.collection('users');
+        const teamsCollection = db.collection('teams');
+        const team = await teamsCollection.insertOne(
+          {
+            name: user[0].name,
+            event: eventId,
+            members: userId,
+            paymentStatus: false,
+          },
+          { session }
+        );
+        teamId = team.ops[0]._id;
+        await usersCollection.updateOne(
+          { _id: userId },
+          { $push: { teams: teamId } },
+          { new: true },
+          { session }
+        );
+      });
+    } catch (err) {
+      throw new ApolloError('Could not complete Trx ', err);
     }
-    const teamsList = await db
-      .collection('teams')
-      .find({ _id: { $in: user[0].teams } })
-      .toArray();
     return {
       code: 200,
       success: true,
-      message: 'Event registered successfully',
-      user: { ...user[0], teams: teamsList },
+      message: 'User registered successfully',
+      user: { id: userId, ...user[0] },
     };
   }
   throw new ApolloError('User is not logged in');

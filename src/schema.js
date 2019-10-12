@@ -43,7 +43,7 @@ const typeDefs = gql`
       phone: String!
     ): MutationResponse
     verify(email: String!, code: String!): MutationResponse
-    eventRegister(userId: ID!, eventId: ID!): MutationResponse
+    eventRegister(userId: ID!, eventId: ID!): EventResponse
     sendInvite(teamId: ID!, email: String!): MutationResponse
     cancelInvite(teamId: ID!, email: String!): MutationResponse
     acceptInvite(teamId: ID!): MutationResponse
@@ -51,11 +51,18 @@ const typeDefs = gql`
     pay(teamId: ID!): MutationResponse
   }
 
+  type EventResponse {
+    code: String
+    success: Boolean!
+    message: String
+    team: Team!
+  }
+
   type MutationResponse {
     code: String
     success: Boolean!
     message: String
-    user: User
+    user: User!
   }
 `;
 
