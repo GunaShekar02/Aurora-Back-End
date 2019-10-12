@@ -18,6 +18,7 @@ MongoClient.connect(config.dbHost, {
     password: config.dbPass,
     authSource: config.dbName,
   },
+  replicaSet: config.dbReplSet,
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
