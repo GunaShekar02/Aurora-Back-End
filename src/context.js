@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const { jwtSecret } = require('./utils/config');
 
-const provideContext = (request, database) => {
+const provideContext = (request, database, client) => {
   const { req } = request;
   const payload = {
     isValid: false,
@@ -9,6 +9,7 @@ const provideContext = (request, database) => {
     email: null,
     id: null,
     db: database,
+    client,
   };
   const authHeader = req.headers.authorization || null;
 

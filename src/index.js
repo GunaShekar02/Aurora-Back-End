@@ -27,7 +27,7 @@ MongoClient.connect(config.dbHost, {
     const server = new ApolloServer({
       typeDefs,
       resolvers,
-      context: req => provideContext(req, db),
+      context: req => provideContext(req, db, client),
     });
 
     const port = config.port || 3001;
