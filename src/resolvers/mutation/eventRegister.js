@@ -8,6 +8,11 @@ const eventRegister = async (_, args, context) => {
   userId = ObjectId(userId);
   eventId = ObjectId(eventId);
   if (isValid) {
+    const singleEvent = await db
+      .collection('events')
+      .find({ _id: eventId })
+      .toArray();
+    if (singleEvent.length === 0) throw new ApolloError('wrong Event Details');
     const verifyRegister = await db
       .collection('teams')
       .find({ event: eventId, 'members.0': userId })
@@ -52,10 +57,6 @@ const eventRegister = async (_, args, context) => {
       const singleTeam = await db
         .collection('teams')
         .find({ _id: teamId })
-        .toArray();
-      const singleEvent = await db
-        .collection('events')
-        .find({ _id: eventId })
         .toArray();
       return {
         code: 200,
