@@ -44,7 +44,7 @@ const typeDefs = gql`
     ): MutationResponse
     verify(email: String!, code: String!): MutationResponse
     eventRegister(userId: ID!, eventId: ID!): EventResponse
-    sendInvite(teamId: ID!, email: String!): MutationResponse
+    sendInvite(teamId: ID!, email: String!): EventResponse
     cancelInvite(teamId: ID!, email: String!): MutationResponse
     acceptInvite(teamId: ID!): MutationResponse
     declineInvite(teamId: ID!): MutationResponse
