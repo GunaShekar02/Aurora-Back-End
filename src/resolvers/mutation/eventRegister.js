@@ -1,4 +1,4 @@
-const { ApolloError } = require('apollo-server-express');
+const { ApolloError, AuthenticationError } = require('apollo-server-express');
 const ObjectId = require('mongodb').ObjectID;
 
 const eventRegister = async (_, args, context) => {
@@ -66,6 +66,6 @@ const eventRegister = async (_, args, context) => {
     }
     throw new Error('You are already registered for this event');
   }
-  throw new ApolloError('User is not logged in');
+  throw new AuthenticationError('User is not logged in');
 };
 module.exports = eventRegister;

@@ -1,4 +1,4 @@
-const { ApolloError } = require('apollo-server-express');
+const { ApolloError, AuthenticationError } = require('apollo-server-express');
 const ObjectId = require('mongodb').ObjectID;
 
 const sendInvite = async (_, args, context) => {
@@ -87,7 +87,7 @@ const sendInvite = async (_, args, context) => {
       }
       throw new ApolloError('Already Invited');
     } else throw new ApolloError('You cannot make any more requests');
-  } else throw new ApolloError('User is not logged in');
+  } else throw new AuthenticationError('User is not logged in');
 };
 
 module.exports = sendInvite;
