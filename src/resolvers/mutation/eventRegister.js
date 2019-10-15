@@ -1,4 +1,4 @@
-const { ApolloError } = require('apollo-server-express');
+const { ApolloError, AuthenticationError } = require('apollo-server-express');
 const ObjectId = require('mongodb').ObjectID;
 
 const eventRegister = async (_, args, context) => {
@@ -8,68 +8,65 @@ const eventRegister = async (_, args, context) => {
   userId = ObjectId(userId);
   eventId = ObjectId(eventId);
   if (isValid) {
-    const user = await db
-      .collection('users')
-      .find({ _id: userId })
+    const singleEvent = await db
+      .collection('events')
+      .find({ _id: eventId })
       .toArray();
-    const updateUser = async session => {
-      const usersCollection = db.collection('users');
-      const teamsCollection = db.collection('teams');
-
-      session.startTransaction({
-        readConcern: { level: 'snapshot' },
-        writeConcern: { w: 'majority' },
-      });
-
-      try {
-        // eslint-disable-next-line no-undef
-        const team = await teamsCollection.insertOne({
-          name: user[0].name,
-          event: eventId,
-          members: userId,
-          paymentStatus: false,
-        });
-        teamId = team.ops[0]._id;
-        await usersCollection.updateOne(
-          { _id: userId },
-          { $push: { teams: teamId } },
-          { new: true }
-        );
-        try {
-          session.commitTransaction();
-        } catch (error) {
-          throw new ApolloError(error);
-        }
-      } catch (error) {
-        session.abortTransaction();
-        throw new ApolloError(error);
-      }
-    };
-    const session = client.startSession({
-      defaultTransactionOptions: {
-        readConcern: { level: 'local' },
-        writeConcern: { w: 'majority' },
-        readPreference: 'primary',
-      },
-    });
-    try {
-      updateUser(session);
-    } catch (error) {
-      throw new ApolloError(error);
-    } finally {
-      session.endSession();
-    }
-    const teamsList = await db
+    if (singleEvent.length === 0) throw new ApolloError('wrong Event Details');
+    const verifyRegister = await db
       .collection('teams')
-      .find({ _id: { $in: user[0].teams } })
+      .find({ event: eventId, 'members.0': userId })
       .toArray();
-    return {
-      code: 200,
-      success: true,
-      message: 'Event registered successfully',
-      user: { ...user[0], teams: teamsList },
-    };
+    if (verifyRegister.length === 0) {
+      const user = await db
+        .collection('users')
+        .find({ _id: userId })
+        .toArray();
+      const session = client.startSession({
+        defaultTransactionOptions: {
+          readConcern: { level: 'local' },
+          writeConcern: { w: 'majority' },
+          readPreference: 'primary',
+        },
+      });
+      try {
+        await session.withTransaction(async () => {
+          const usersCollection = db.collection('users');
+          const teamsCollection = db.collection('teams');
+          const team = await teamsCollection.insertOne(
+            {
+              name: user[0].name,
+              event: eventId,
+              members: [userId],
+              paymentStatus: false,
+              pendingInvitations: [],
+            },
+            { session }
+          );
+          teamId = team.ops[0]._id;
+          await usersCollection.updateOne(
+            { _id: userId },
+            { $push: { teams: { teamId, eventId } } },
+            { new: true },
+            { session }
+          );
+        });
+      } catch (err) {
+        throw new ApolloError('Something went wrong', 'TRX_FAILED');
+      }
+      const singleTeam = await db
+        .collection('teams')
+        .find({ _id: teamId })
+        .toArray();
+      return {
+        code: 200,
+        success: true,
+        message: 'User registered successfully',
+        team: { id: teamId, ...singleTeam[0], event: { id: eventId, ...singleEvent[0] } },
+      };
+    }
+    throw new Error('You are already registered for this event');
   }
-  throw new ApolloError('User is not logged in');
+  throw new AuthenticationError('User is not logged in');
 };
 module.exports = eventRegister;
