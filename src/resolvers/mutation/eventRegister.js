@@ -3,7 +3,8 @@ const ObjectId = require('mongodb').ObjectID;
 
 const eventRegister = async (_, args, context) => {
   const { isValid, db, client } = context;
-  let { userId, eventId } = args;
+  let userId = context.id;
+  let { eventId } = args;
   let teamId;
   userId = ObjectId(userId);
   eventId = ObjectId(eventId);
@@ -43,26 +44,21 @@ const eventRegister = async (_, args, context) => {
             },
             { session }
           );
-          teamId = team.ops[0]._id;
+          teamId = team.insertedId;
           await usersCollection.updateOne(
             { _id: userId },
-            { $push: { teams: { teamId, eventId } } },
-            { new: true },
+            { $push: { teams: { teamId } } },
             { session }
           );
         });
       } catch (err) {
         throw new ApolloError('Something went wrong', 'TRX_FAILED');
       }
-      const singleTeam = await db
-        .collection('teams')
-        .find({ _id: teamId })
-        .toArray();
       return {
         code: 200,
         success: true,
         message: 'User registered successfully',
-        team: { id: teamId, ...singleTeam[0], event: { id: eventId, ...singleEvent[0] } },
+        team: { id: teamId, paymentStatus: false },
       };
     }
     throw new Error('You are already registered for this event');
