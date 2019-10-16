@@ -30,12 +30,12 @@ const cancelInvite = async (_, args, context) => {
         await usersCollection.updateOne(
           { email },
           { $pull: { teamInvitations: teamId } },
-          { new: true }
+          { session }
         );
         await teamsCollection.updateOne(
           { _id: teamId, members: id },
           { $pull: { pendingInvitations: email } },
-          { new: true }
+          { session }
         );
       });
     } catch (err) {
@@ -44,7 +44,7 @@ const cancelInvite = async (_, args, context) => {
     return {
       code: 200,
       success: true,
-      message: 'Invite sent successfully',
+      message: 'Invite cancelled',
       team: {
         id: teamId,
         ...team[0],
