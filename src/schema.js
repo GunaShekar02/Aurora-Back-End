@@ -27,7 +27,7 @@ const typeDefs = gql`
 
   type Team {
     id: String!
-    name: String!
+    name: String
     event: Event!
     members: [User!]!
     paymentStatus: Boolean!
@@ -43,9 +43,9 @@ const typeDefs = gql`
       phone: String!
     ): MutationResponse
     verify(email: String!, code: String!): MutationResponse
-    eventRegister(userId: String!, eventId: Int!): EventResponse
-    sendInvite(teamId: String!, email: String!): EventResponse
-    cancelInvite(teamId: String!, email: String!): EventResponse
+    eventRegister(eventId: Int!): EventResponse
+    sendInvite(teamId: String!, arId: String!): EventResponse
+    cancelInvite(teamId: String!, arId: String!): EventResponse
     acceptInvite(teamId: String!): MutationResponse
     declineInvite(teamId: String!): MutationResponse
     pay(teamId: String!): MutationResponse
