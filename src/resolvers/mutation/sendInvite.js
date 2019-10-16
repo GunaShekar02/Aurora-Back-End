@@ -63,12 +63,12 @@ const sendInvite = async (_, args, context) => {
             await usersCollection.updateOne(
               { email },
               { $push: { teamInvitations: teamId } },
-              { new: true }
+              { session }
             );
             await teamsCollection.updateOne(
               { event: eventId, members: id },
               { $push: { pendingInvitations: email } },
-              { new: true }
+              { session }
             );
           });
         } catch (err) {
