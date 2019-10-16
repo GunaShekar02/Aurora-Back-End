@@ -27,7 +27,7 @@ const signup = async (_, args, context) => {
 
     const hash = await bcrypt.hash(password, 10);
 
-    const res = await db.collection('users').insertOne({
+    await db.collection('users').insertOne({
       hash,
       ...payload,
     });
@@ -37,7 +37,7 @@ const signup = async (_, args, context) => {
       success: true,
       message: 'User registered successfully',
       user: {
-        id: res.insertedId,
+        id: arId,
         ...payload,
       },
     };
