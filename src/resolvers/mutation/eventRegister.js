@@ -1,13 +1,12 @@
 const { ApolloError, AuthenticationError } = require('apollo-server-express');
-const ObjectId = require('mongodb').ObjectID;
+
+const { generateTeamId } = require('../../utils/helpers');
 
 const eventRegister = async (_, args, context) => {
   const { isValid, db, client } = context;
-  let userId = context.id;
-  let { eventId } = args;
+  const userId = context.id;
+  const { eventId } = args;
   let teamId;
-  userId = ObjectId(userId);
-  eventId = ObjectId(eventId);
   if (isValid) {
     const singleEvent = await db
       .collection('events')
@@ -16,13 +15,9 @@ const eventRegister = async (_, args, context) => {
     if (singleEvent.length === 0) throw new ApolloError('wrong Event Details');
     const verifyRegister = await db
       .collection('teams')
-      .find({ event: eventId, 'members.0': userId })
+      .find({ event: eventId, members: userId })
       .toArray();
     if (verifyRegister.length === 0) {
-      const user = await db
-        .collection('users')
-        .find({ _id: userId })
-        .toArray();
       const session = client.startSession({
         defaultTransactionOptions: {
           readConcern: { level: 'local' },
@@ -34,9 +29,11 @@ const eventRegister = async (_, args, context) => {
         await session.withTransaction(async () => {
           const usersCollection = db.collection('users');
           const teamsCollection = db.collection('teams');
-          const team = await teamsCollection.insertOne(
+          teamId = await generateTeamId(userId, eventId, db);
+          await teamsCollection.insertOne(
             {
-              name: user[0].name,
+              _id: teamId,
+              name: 'currently not req',
               event: eventId,
               members: [userId],
               paymentStatus: false,
@@ -44,7 +41,6 @@ const eventRegister = async (_, args, context) => {
             },
             { session }
           );
-          teamId = team.insertedId;
           await usersCollection.updateOne(
             { _id: userId },
             { $push: { teams: { teamId } } },
@@ -65,4 +61,5 @@ const eventRegister = async (_, args, context) => {
   }
   throw new AuthenticationError('User is not logged in');
 };
+
 module.exports = eventRegister;
