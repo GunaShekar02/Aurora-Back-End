@@ -34,21 +34,17 @@ const generateArId = async (name, db) => {
   else if (shortName.length === 2) shortName += 'X';
   const randomNumber = generateRandomNumber();
   const arId = `AR-${shortName}-${randomNumber}`;
-  if (!(await findUser(arId, db))) {
-    return arId;
-  }
+  if (!(await findUser(arId, db))) return arId;
   const newArId = await generateArId(name, db);
   return newArId;
 };
 
-const generateTeamId = (arId, eventId, db) => {
-  let randomNumber;
-  let teamId;
-  for (;;) {
-    randomNumber = generateRandomNumber();
-    teamId = `${arId}-${eventId}-${randomNumber}`;
-    if (!findTeam(teamId, db)) return teamId;
-  }
+const generateTeamId = async (arId, eventId, db) => {
+  const randomNumber = generateRandomNumber();
+  const teamId = `${arId}-${eventId}-${randomNumber}`;
+  if (!(await findTeam(teamId, db))) return teamId;
+  const newTeamId = await generateTeamId(arId, eventId, db);
+  return newTeamId;
 };
 
 module.exports = { generateArId, generateTeamId };
