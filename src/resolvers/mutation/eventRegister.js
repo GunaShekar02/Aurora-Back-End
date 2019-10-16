@@ -43,7 +43,7 @@ const eventRegister = async (_, args, context) => {
           );
           await usersCollection.updateOne(
             { _id: userId },
-            { $push: { teams: { teamId } } },
+            { $push: { teams: teamId } },
             { session }
           );
         });
