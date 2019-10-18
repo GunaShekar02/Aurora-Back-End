@@ -1,5 +1,4 @@
 const { ApolloError, AuthenticationError } = require('apollo-server-express');
-// const ObjectId = require('mongodb').ObjectID;
 
 const cancelInvite = async (_, args, context) => {
   const { isValid, db, client, id } = context;
