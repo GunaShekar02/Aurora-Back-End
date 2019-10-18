@@ -6,6 +6,7 @@ const eventRegister = require('./resolvers/mutation/eventRegister');
 const sendInvite = require('./resolvers/mutation/sendInvite');
 const cancelInvite = require('./resolvers/mutation/cancelInvite');
 const acceptInvite = require('./resolvers/mutation/acceptInvite');
+const declineInvite = require('./resolvers/mutation/declineInvite');
 
 const resolvers = {
   Query: {
@@ -18,6 +19,7 @@ const resolvers = {
     sendInvite,
     cancelInvite,
     acceptInvite,
+    declineInvite,
   },
 };
 
