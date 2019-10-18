@@ -1,20 +1,20 @@
 const { ApolloError, AuthenticationError } = require('apollo-server-express');
-const ObjectId = require('mongodb').ObjectID;
 
 const cancelInvite = async (_, args, context) => {
-  const { isValid, db, client } = context;
-  let { id } = context;
+  const { isValid, db, client, id } = context;
   if (isValid) {
-    let { teamId } = args;
-    const { email } = args;
-    teamId = ObjectId(teamId);
-    id = ObjectId(id);
+    const { teamId, arId } = args;
     const team = await db
       .collection('teams')
       .find({ _id: teamId, members: id })
       .toArray();
     if (team.length === 0)
       throw new ApolloError('You should be a member of the team to cancel Invite');
+    const verifyInvite = await db
+      .collection('teams')
+      .find({ _id: teamId, pendingInvitations: arId })
+      .toArray();
+    if (verifyInvite.length === 0) throw new ApolloError('User not invited before');
     const session = client.startSession({
       defaultTransactionOptions: {
         readConcern: { level: 'local' },
@@ -28,14 +28,14 @@ const cancelInvite = async (_, args, context) => {
         const teamsCollection = db.collection('teams');
 
         await usersCollection.updateOne(
-          { email },
+          { _id: arId },
           { $pull: { teamInvitations: teamId } },
-          { new: true }
+          { session }
         );
         await teamsCollection.updateOne(
           { _id: teamId, members: id },
-          { $pull: { pendingInvitations: email } },
-          { new: true }
+          { $pull: { pendingInvitations: arId } },
+          { session }
         );
       });
     } catch (err) {
@@ -44,7 +44,7 @@ const cancelInvite = async (_, args, context) => {
     return {
       code: 200,
       success: true,
-      message: 'Invite sent successfully',
+      message: 'Invite cancelled',
       team: {
         id: teamId,
         ...team[0],
