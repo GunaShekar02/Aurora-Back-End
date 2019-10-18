@@ -1,20 +1,15 @@
 const { ApolloError, AuthenticationError } = require('apollo-server-express');
-const ObjectId = require('mongodb').ObjectID;
 
 const sendInvite = async (_, args, context) => {
-  const { isValid, db, client } = context;
-  let { id } = context;
+  const { isValid, db, client, id } = context;
   if (isValid) {
-    let { teamId } = args;
-    const { email } = args;
-    teamId = ObjectId(teamId);
-    id = ObjectId(id);
+    const { teamId, arId } = args;
     const team = await db
       .collection('teams')
       .find({ _id: teamId })
       .toArray();
     if (team.length === 0) throw new ApolloError('Invalid team-Id');
-    const eventId = ObjectId(team[0].event);
+    const eventId = team[0].event;
     const event = await db
       .collection('events')
       .find({ _id: eventId })
@@ -24,28 +19,28 @@ const sendInvite = async (_, args, context) => {
       .collection('users')
       .find({ _id: id, 'teams.eventId': eventId })
       .toArray();
-    const receiverUser = await db
-      .collection('users')
-      .find({ email })
-      .toArray();
-    if (receiverUser.length === 0) throw new ApolloError('User does not exist');
     if (RegisteredUser.length === 0) {
       throw new ApolloError('You are not registered for the event to invite');
     }
+    const receiverUser = await db
+      .collection('users')
+      .find({ _id: arId })
+      .toArray();
+    if (receiverUser.length === 0) throw new ApolloError('User does not exist');
     const alreadyRegistered = await db
       .collection('users')
       .find({
-        email,
+        _id: arId,
         'teams.eventId': eventId,
       })
       .toArray();
     if (alreadyRegistered.length !== 0) {
-      throw new ApolloError('The user is already in a team for the same event');
+      throw new ApolloError('The user is already in some other team for the same event');
     }
     if (team[0].members.length + team[0].pendingInvitations.length < maxSize) {
       const Invited = await db
         .collection('users')
-        .find({ email, teamInvitations: teamId })
+        .find({ _id: arId, teamInvitations: teamId })
         .toArray();
       if (Invited.length === 0) {
         const session = client.startSession({
@@ -61,13 +56,13 @@ const sendInvite = async (_, args, context) => {
             const teamsCollection = db.collection('teams');
 
             await usersCollection.updateOne(
-              { email },
+              { _id: arId },
               { $push: { teamInvitations: teamId } },
               { session }
             );
             await teamsCollection.updateOne(
-              { event: eventId, members: id },
-              { $push: { pendingInvitations: email } },
+              { event: eventId, _id: teamId },
+              { $push: { pendingInvitations: arId } },
               { session }
             );
           });
@@ -81,12 +76,12 @@ const sendInvite = async (_, args, context) => {
           team: {
             id: teamId,
             ...team[0],
-            event: { id: eventId, ...event[0] },
+            event: { id: eventId },
           },
         };
       }
       throw new ApolloError('Already Invited');
-    } else throw new ApolloError('You cannot make any more requests');
+    } else throw new ApolloError('You cannot make any more invites');
   } else throw new AuthenticationError('User is not logged in');
 };
 

@@ -7,14 +7,14 @@ const typeDefs = gql`
   }
 
   type Event {
-    id: ID!
+    id: Int!
     name: String!
     maxSize: Int!
     fee: Int!
   }
 
   type User {
-    id: ID!
+    id: String!
     email: String!
     name: String!
     college: String!
@@ -26,8 +26,8 @@ const typeDefs = gql`
   }
 
   type Team {
-    id: ID!
-    name: String!
+    id: String!
+    name: String
     event: Event!
     members: [User!]!
     paymentStatus: Boolean!
@@ -43,12 +43,12 @@ const typeDefs = gql`
       phone: String!
     ): MutationResponse
     verify(email: String!, code: String!): MutationResponse
-    eventRegister(userId: ID!, eventId: ID!): EventResponse
-    sendInvite(teamId: ID!, email: String!): EventResponse
-    cancelInvite(teamId: ID!, email: String!): EventResponse
-    acceptInvite(teamId: ID!): MutationResponse
-    declineInvite(teamId: ID!): MutationResponse
-    pay(teamId: ID!): MutationResponse
+    eventRegister(eventId: Int!): EventResponse
+    sendInvite(teamId: String!, arId: String!): EventResponse
+    cancelInvite(teamId: String!, arId: String!): EventResponse
+    acceptInvite(teamId: String!): MutationResponse
+    declineInvite(teamId: String!): MutationResponse
+    pay(teamId: String!): MutationResponse
   }
 
   type EventResponse {

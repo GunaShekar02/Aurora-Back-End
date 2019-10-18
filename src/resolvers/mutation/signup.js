@@ -1,6 +1,8 @@
 const { UserInputError } = require('apollo-server-express');
 const bcrypt = require('bcrypt');
 
+const { generateArId } = require('../../utils/helpers');
+
 const signup = async (_, args, context) => {
   const { db } = context;
   const { email, password, name, college, phone } = args;
@@ -10,7 +12,9 @@ const signup = async (_, args, context) => {
     .find({ email })
     .toArray();
   if (user.length === 0) {
+    const arId = await generateArId(name, db);
     const payload = {
+      _id: arId,
       email,
       name,
       college,
@@ -23,7 +27,7 @@ const signup = async (_, args, context) => {
 
     const hash = await bcrypt.hash(password, 10);
 
-    const res = await db.collection('users').insertOne({
+    await db.collection('users').insertOne({
       hash,
       ...payload,
     });
@@ -33,7 +37,7 @@ const signup = async (_, args, context) => {
       success: true,
       message: 'User registered successfully',
       user: {
-        id: res.insertedId,
+        id: arId,
         ...payload,
       },
     };
