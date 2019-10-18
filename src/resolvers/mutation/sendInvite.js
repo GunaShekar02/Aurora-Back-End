@@ -6,7 +6,7 @@ const sendInvite = async (_, args, context) => {
     const { teamId, arId } = args;
     const team = await db
       .collection('teams')
-      .find({ _id: teamId })
+      .find({ _id: teamId, members: id })
       .toArray();
     if (team.length === 0) throw new ApolloError('Invalid team-Id');
     const eventId = team[0].event;
@@ -40,7 +40,7 @@ const sendInvite = async (_, args, context) => {
     if (team[0].members.length + team[0].pendingInvitations.length < maxSize) {
       const Invited = await db
         .collection('users')
-        .find({ _id: arId, teamInvitations: teamId })
+        .find({ _id: arId, 'teamInvitations.teamId': teamId })
         .toArray();
       if (Invited.length === 0) {
         const session = client.startSession({
@@ -57,7 +57,7 @@ const sendInvite = async (_, args, context) => {
 
             await usersCollection.updateOne(
               { _id: arId },
-              { $push: { teamInvitations: teamId } },
+              { $push: { teamInvitations: { teamId, eventId, invitedBy: id } } },
               { session }
             );
             await teamsCollection.updateOne(
