@@ -14,6 +14,15 @@ const acceptInvite = async (_, args, context) => {
       .find({ _id: id, 'teamInvitations.teamId': teamId })
       .toArray();
     if (user.length === 0) throw new ApolloError('You are not invited');
+    const invites = await db
+      .collection('users')
+      .aggregate([
+        { $unwind: '$teamInvitations' },
+        { $match: { 'teamInvitations.eventId': team[0].event } },
+        { $project: { 'teamInvitations.teamId': 1 } },
+      ])
+      .toArray();
+    console.log(invites);
     const session = client.startSession({
       defaultTransactionOptions: {
         readConcern: { level: 'local' },
@@ -37,10 +46,17 @@ const acceptInvite = async (_, args, context) => {
           { _id: teamId },
           {
             $push: { members: id },
-            $pull: { pendingInvitations: id },
           },
           { session }
         );
+        for (let i = 0; i < invites.length; i += 1) {
+          // eslint-disable-next-line no-await-in-loop
+          await teamsCollection.updateOne(
+            { _id: invites[i].teamInvitations.teamId },
+            { $pull: { pendingInvitations: id } },
+            { session }
+          );
+        }
       });
     } catch (err) {
       throw new ApolloError('Something went wrong', 'TRX_FAILED');
