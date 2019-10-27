@@ -1,6 +1,8 @@
 const { UserInputError } = require('apollo-server-express');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
+const { jwtSecret } = require('../../utils/config');
 const { generateArId } = require('../../utils/helpers');
 
 const signup = async (_, args, context) => {
@@ -32,10 +34,14 @@ const signup = async (_, args, context) => {
       ...payload,
     });
 
+    const token = await jwt.sign({ email }, jwtSecret, {
+      expiresIn: '30d',
+    });
+
     return {
       code: 200,
       success: true,
-      message: 'User registered successfully',
+      message: `User registered successfully ${token}`,
       user: {
         id: arId,
         ...payload,

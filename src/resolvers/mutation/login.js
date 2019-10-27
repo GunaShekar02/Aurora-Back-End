@@ -1,4 +1,4 @@
-const { UserInputError } = require('apollo-server-express');
+const { UserInputError, ApolloError } = require('apollo-server-express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -13,6 +13,7 @@ const login = async (_, args, context) => {
     .find({ email })
     .toArray();
   if (user.length !== 0) {
+    if (!user[0].isVerified) throw new ApolloError('User not verified');
     const match = await bcrypt.compare(password, user[0].hash);
     if (match) {
       const payload = {
