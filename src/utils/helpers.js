@@ -27,8 +27,8 @@ const generateArId = async (name, db) => {
       .match(/[a-zA-Z]+/g)
       .toString()
       .replace(/,/g, '')
-      .toUpperCase()
-      .substr(0, 3);
+      .substr(0, 3)
+      .toUpperCase();
   }
   if (shortName.length === 1) shortName += 'XX';
   else if (shortName.length === 2) shortName += 'X';
