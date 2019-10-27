@@ -48,6 +48,7 @@ const typeDefs = gql`
     cancelInvite(teamId: String!, arId: String!): EventResponse
     acceptInvite(teamId: String!): EventResponse
     declineInvite(teamId: String!): EventResponse
+    removeMember(teamId: String!, arId: String!): EventResponse
     pay(teamId: String!): MutationResponse
   }
 
