@@ -8,6 +8,7 @@ const cancelInvite = require('./resolvers/mutation/cancelInvite');
 const acceptInvite = require('./resolvers/mutation/acceptInvite');
 const declineInvite = require('./resolvers/mutation/declineInvite');
 const removeMember = require('./resolvers/mutation/removeMember');
+const leaveTeam = require('./resolvers/mutation/leaveTeam');
 
 const resolvers = {
   Query: {
@@ -22,6 +23,7 @@ const resolvers = {
     acceptInvite,
     declineInvite,
     removeMember,
+    leaveTeam,
   },
 };
 
