@@ -22,7 +22,6 @@ const acceptInvite = async (_, args, context) => {
         { $project: { 'teamInvitations.teamId': 1 } },
       ])
       .toArray();
-    console.log(invites);
     const session = client.startSession({
       defaultTransactionOptions: {
         readConcern: { level: 'local' },
