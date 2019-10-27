@@ -8,7 +8,7 @@ const sendInvite = async (_, args, context) => {
       .collection('teams')
       .find({ _id: teamId, members: id })
       .toArray();
-    if (team.length === 0) throw new ApolloError('Invalid team-Id');
+    if (team.length === 0) throw new ApolloError('Invalid team-Id or you are not a team member');
     const eventId = team[0].event;
     const event = await db
       .collection('events')
