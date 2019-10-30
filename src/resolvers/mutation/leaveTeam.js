@@ -9,6 +9,11 @@ const declineInvite = async (_, args, context) => {
       .find({ _id: teamId, members: id })
       .toArray();
     if (team.length === 0) throw new ApolloError('You are not a member of this team');
+    const invites = await db
+      .collection('teams')
+      .aggregate([{ $unwind: '$pendingInvitations' }, { $project: { pendingInvitations: 1 } }])
+      .toArray();
+    // console.log(invites);
     const session = client.startSession({
       defaultTransactionOptions: {
         readConcern: { level: 'local' },
@@ -22,6 +27,14 @@ const declineInvite = async (_, args, context) => {
         const teamsCollection = db.collection('teams');
         await usersCollection.updateOne({ _id: id }, { $pull: { teams: { teamId } } }, { session });
         if (team[0].members.length === 1) {
+          for (let i = 0; i < invites.length; i += 1) {
+            // eslint-disable-next-line no-await-in-loop
+            await usersCollection.updateOne(
+              { _id: invites[i].pendingInvitations },
+              { $pull: { teamInvitations: { teamId: invites[i]._id } } },
+              { session }
+            );
+          }
           teamsCollection.deleteOne({ _id: teamId });
         } else {
           await teamsCollection.updateOne({ _id: teamId }, { $pull: { members: id } }, { session });
