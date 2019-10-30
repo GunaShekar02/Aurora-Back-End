@@ -13,7 +13,6 @@ const declineInvite = async (_, args, context) => {
       .collection('teams')
       .aggregate([{ $unwind: '$pendingInvitations' }, { $project: { pendingInvitations: 1 } }])
       .toArray();
-    // console.log(invites);
     const session = client.startSession({
       defaultTransactionOptions: {
         readConcern: { level: 'local' },
