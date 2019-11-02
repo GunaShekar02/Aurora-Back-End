@@ -29,6 +29,7 @@ MongoClient.connect(config.dbHost, {
       typeDefs,
       resolvers,
       context: req => provideContext(req, db, client),
+      tracing: true,
     });
 
     const port = config.port || 3001;
