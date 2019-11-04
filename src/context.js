@@ -16,7 +16,7 @@ const provideContext = (request, database, client) => {
   if (authHeader) {
     const token = authHeader.replace('bearer ', '');
 
-    jwt.verify(token, jwtSecret, (err, decoded) => {
+    jwt.verify(token, jwtSecret.pubKey, { algorithm: 'ES512' }, (err, decoded) => {
       if (!err) {
         payload.isValid = true;
         payload.token = token;

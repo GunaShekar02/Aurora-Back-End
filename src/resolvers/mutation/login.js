@@ -19,7 +19,8 @@ const login = async (_, args, context) => {
         email: user[0].email,
         id: user[0]._id,
       };
-      const token = await jwt.sign(payload, jwtSecret, {
+      const token = jwt.sign(payload, jwtSecret.privKey, {
+        algorithm: 'ES512',
         expiresIn: '30d',
       });
       return token;

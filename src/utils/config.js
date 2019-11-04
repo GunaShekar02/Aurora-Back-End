@@ -1,4 +1,8 @@
+const fs = require('fs');
 require('dotenv').config();
+
+const privKey = fs.readFileSync('keys/ecd.pem');
+const pubKey = fs.readFileSync('keys/ecd.pub.pem');
 
 const config = {
   port: process.env.PORT,
@@ -7,7 +11,10 @@ const config = {
   dbPass: process.env.DB_PASS,
   dbName: process.env.DB_NAME,
   dbReplSet: process.env.DB_REPL_NAME,
-  jwtSecret: process.env.JWT_TOKEN,
+  jwtSecret: {
+    privKey,
+    pubKey,
+  },
 };
 
 module.exports = config;
