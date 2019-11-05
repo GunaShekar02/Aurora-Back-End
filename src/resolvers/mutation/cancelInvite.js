@@ -32,18 +32,20 @@ const cancelInvite = async (_, args, context) => {
         const usersCollection = db.collection('users');
         const teamsCollection = db.collection('teams');
 
-        await usersCollection.updateOne(
+        const userRes = usersCollection.updateOne(
           { _id: arId },
           { $pull: { teamInvitations: { teamId } } },
           false,
           true,
           { session }
         );
-        await teamsCollection.updateOne(
+        const teamRes = teamsCollection.updateOne(
           { _id: teamId, members: id },
           { $pull: { pendingInvitations: arId } },
           { session }
         );
+
+        return Promise.all([userRes, teamRes]);
       });
     } catch (err) {
       throw new ApolloError('Something went wrong', 'TRX_FAILED');
