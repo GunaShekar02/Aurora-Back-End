@@ -14,7 +14,11 @@ const leaveTeam = async (_, args, context) => {
 
     const invites = await db
       .collection('teams')
-      .aggregate([{ $unwind: '$pendingInvitations' }, { $project: { pendingInvitations: 1 } }])
+      .aggregate([
+        { $match: { _id: teamId } },
+        { $unwind: '$pendingInvitations' },
+        { $project: { pendingInvitations: 1 } },
+      ])
       .toArray();
 
     const session = client.startSession({
