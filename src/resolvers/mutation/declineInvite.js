@@ -39,6 +39,8 @@ const declineInvite = async (_, args, context) => {
       });
     } catch (err) {
       throw new ApolloError('Something went wrong', 'TRX_FAILED');
+    } finally {
+      await session.endSession();
     }
     return {
       code: 200,
