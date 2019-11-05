@@ -7,16 +7,20 @@ const eventRegister = async (_, args, context) => {
   const userId = context.id;
   const { eventId } = args;
   let teamId;
+
   if (isValid) {
     const singleEvent = await db
       .collection('events')
       .find({ _id: eventId })
       .toArray();
+
     if (singleEvent.length === 0) throw new ApolloError('wrong Event Details');
+
     const verifyRegister = await db
       .collection('teams')
       .find({ event: eventId, members: userId })
       .toArray();
+
     if (verifyRegister.length === 0) {
       const session = client.startSession({
         defaultTransactionOptions: {
@@ -29,6 +33,7 @@ const eventRegister = async (_, args, context) => {
         await session.withTransaction(async () => {
           const usersCollection = db.collection('users');
           const teamsCollection = db.collection('teams');
+
           teamId = await generateTeamId(userId, eventId, db);
           await teamsCollection.insertOne(
             {
