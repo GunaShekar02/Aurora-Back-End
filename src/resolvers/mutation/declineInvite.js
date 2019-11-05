@@ -2,13 +2,16 @@ const { ApolloError, AuthenticationError } = require('apollo-server-express');
 
 const declineInvite = async (_, args, context) => {
   const { isValid, db, client, id } = context;
+
   if (isValid) {
     const { teamId } = args;
     const user = await db
       .collection('users')
       .find({ _id: id, 'teamInvitations.teamId': { teamId } })
       .toArray();
+
     if (user.length === 0) throw new ApolloError('You are not invited');
+
     const session = client.startSession({
       defaultTransactionOptions: {
         readConcern: { level: 'local' },
