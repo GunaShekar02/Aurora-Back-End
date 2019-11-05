@@ -22,6 +22,16 @@ const eventRegister = async (_, args, context) => {
       .toArray();
 
     if (verifyRegister.length === 0) {
+      const invites = await db
+        .collection('users')
+        .aggregate([
+          { $match: { _id: userId } },
+          { $unwind: '$teamInvitations' },
+          { $match: { 'teamInvitations.eventId': eventId } },
+          { $project: { teamInvitations: 1 } },
+        ])
+        .toArray();
+
       const session = client.startSession({
         defaultTransactionOptions: {
           readConcern: { level: 'local' },
@@ -35,7 +45,8 @@ const eventRegister = async (_, args, context) => {
           const teamsCollection = db.collection('teams');
 
           teamId = await generateTeamId(userId, eventId, db);
-          await teamsCollection.insertOne(
+
+          const teamRes = teamsCollection.insertOne(
             {
               _id: teamId,
               name: 'currently not req',
@@ -46,11 +57,20 @@ const eventRegister = async (_, args, context) => {
             },
             { session }
           );
-          await usersCollection.updateOne(
+          const userRes = usersCollection.updateOne(
             { _id: userId },
             { $push: { teams: { teamId, eventId } } },
             { session }
           );
+          const invitePromises = invites.map(invite => {
+            return usersCollection.updateOne(
+              { _id: userId },
+              { $pull: { teamInvitations: { teamId: invite.teamInvitations.teamId } } },
+              { session }
+            );
+          });
+
+          return Promise.all(invitePromises.concat([userRes, teamRes]));
         });
       } catch (err) {
         throw new ApolloError('Something went wrong', 'TRX_FAILED');
