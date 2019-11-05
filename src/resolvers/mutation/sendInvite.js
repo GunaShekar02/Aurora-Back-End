@@ -67,16 +67,18 @@ const sendInvite = async (_, args, context) => {
             const usersCollection = db.collection('users');
             const teamsCollection = db.collection('teams');
 
-            await usersCollection.updateOne(
+            const userRes = usersCollection.updateOne(
               { _id: arId },
               { $push: { teamInvitations: { teamId, eventId, invitedBy: id } } },
               { session }
             );
-            await teamsCollection.updateOne(
+            const teamRes = teamsCollection.updateOne(
               { event: eventId, _id: teamId },
               { $push: { pendingInvitations: arId } },
               { session }
             );
+
+            return Promise.all([userRes, teamRes]);
           });
         } catch (err) {
           throw new ApolloError('Something went wrong', 'TRX_FAILED');
