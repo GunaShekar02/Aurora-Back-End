@@ -57,7 +57,7 @@ const eventRegister = async (_, args, context) => {
             },
             { session }
           );
-          await usersCollection.updateOne(
+          const userRes = usersCollection.updateOne(
             { _id: userId },
             { $push: { teams: { teamId, eventId } } },
             { session }
@@ -70,7 +70,7 @@ const eventRegister = async (_, args, context) => {
             );
           });
 
-          return Promise.all(invitePromises.concat([teamRes]));
+          return Promise.all(invitePromises.concat([teamRes, userRes]));
         });
       } catch (err) {
         throw new ApolloError('Something went wrong', 'TRX_FAILED');
