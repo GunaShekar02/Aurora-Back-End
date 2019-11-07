@@ -7,17 +7,31 @@ const eventRegister = async (_, args, context) => {
   const userId = context.id;
   const { eventId } = args;
   let teamId;
+
   if (isValid) {
     const singleEvent = await db
       .collection('events')
       .find({ _id: eventId })
       .toArray();
+
     if (singleEvent.length === 0) throw new ApolloError('wrong Event Details');
+
     const verifyRegister = await db
       .collection('teams')
       .find({ event: eventId, members: userId })
       .toArray();
+
     if (verifyRegister.length === 0) {
+      const invites = await db
+        .collection('users')
+        .aggregate([
+          { $match: { _id: userId } },
+          { $unwind: '$teamInvitations' },
+          { $match: { 'teamInvitations.eventId': eventId } },
+          { $project: { teamInvitations: 1 } },
+        ])
+        .toArray();
+
       const session = client.startSession({
         defaultTransactionOptions: {
           readConcern: { level: 'local' },
@@ -29,8 +43,10 @@ const eventRegister = async (_, args, context) => {
         await session.withTransaction(async () => {
           const usersCollection = db.collection('users');
           const teamsCollection = db.collection('teams');
+
           teamId = await generateTeamId(userId, eventId, db);
-          await teamsCollection.insertOne(
+
+          const teamRes = teamsCollection.insertOne(
             {
               _id: teamId,
               name: 'currently not req',
@@ -41,14 +57,25 @@ const eventRegister = async (_, args, context) => {
             },
             { session }
           );
-          await usersCollection.updateOne(
+          const userRes = usersCollection.updateOne(
             { _id: userId },
             { $push: { teams: { teamId, eventId } } },
             { session }
           );
+          const invitePromises = invites.map(invite => {
+            return usersCollection.updateOne(
+              { _id: userId },
+              { $pull: { teamInvitations: { teamId: invite.teamInvitations.teamId } } },
+              { session }
+            );
+          });
+
+          return Promise.all(invitePromises.concat([teamRes, userRes]));
         });
       } catch (err) {
         throw new ApolloError('Something went wrong', 'TRX_FAILED');
+      } finally {
+        await session.endSession();
       }
       return {
         code: 200,

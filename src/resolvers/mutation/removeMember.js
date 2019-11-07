@@ -2,14 +2,17 @@ const { ApolloError, AuthenticationError } = require('apollo-server-express');
 
 const declineInvite = async (_, args, context) => {
   const { isValid, db, client, id } = context;
+
   if (isValid) {
     const { teamId, arId } = args;
     const team = await db
       .collection('teams')
       .find({ _id: teamId, members: [id, arId] })
       .toArray();
+
     if (team.length === 0)
       throw new ApolloError('Either You  or the user is not a member of this team');
+
     const session = client.startSession({
       defaultTransactionOptions: {
         readConcern: { level: 'local' },
@@ -22,15 +25,23 @@ const declineInvite = async (_, args, context) => {
         const usersCollection = db.collection('users');
         const teamsCollection = db.collection('teams');
 
-        await usersCollection.updateOne(
+        const userRes = usersCollection.updateOne(
           { _id: arId },
           { $pull: { teams: { teamId } } },
           { session }
         );
-        await teamsCollection.updateOne({ _id: teamId }, { $pull: { members: arId } }, { session });
+        const teamRes = teamsCollection.updateOne(
+          { _id: teamId },
+          { $pull: { members: arId } },
+          { session }
+        );
+
+        return Promise.all([userRes, teamRes]);
       });
     } catch (err) {
       throw new ApolloError('Something went wrong', 'TRX_FAILED');
+    } finally {
+      await session.endSession();
     }
     return {
       code: 200,

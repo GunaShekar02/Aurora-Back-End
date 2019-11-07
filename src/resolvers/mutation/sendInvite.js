@@ -2,23 +2,30 @@ const { ApolloError, AuthenticationError } = require('apollo-server-express');
 
 const sendInvite = async (_, args, context) => {
   const { isValid, db, client, id } = context;
+
   if (isValid) {
     const { teamId, arId } = args;
     const team = await db
       .collection('teams')
       .find({ _id: teamId, members: id })
       .toArray();
+
     if (team.length === 0) throw new ApolloError('Invalid team-Id or you are not a team member');
+
     const eventId = team[0].event;
+
     const event = await db
       .collection('events')
       .find({ _id: eventId })
       .toArray();
+
     const { maxSize } = event[0];
+
     const RegisteredUser = await db
       .collection('users')
       .find({ _id: id, 'teams.eventId': eventId })
       .toArray();
+
     if (RegisteredUser.length === 0) {
       throw new ApolloError('You are not registered for the event to invite');
     }
@@ -26,7 +33,9 @@ const sendInvite = async (_, args, context) => {
       .collection('users')
       .find({ _id: arId })
       .toArray();
+
     if (receiverUser.length === 0) throw new ApolloError('User does not exist');
+
     const alreadyRegistered = await db
       .collection('users')
       .find({
@@ -34,6 +43,7 @@ const sendInvite = async (_, args, context) => {
         'teams.eventId': eventId,
       })
       .toArray();
+
     if (alreadyRegistered.length !== 0) {
       throw new ApolloError('The user is already in some other team for the same event');
     }
@@ -42,6 +52,7 @@ const sendInvite = async (_, args, context) => {
         .collection('users')
         .find({ _id: arId, 'teamInvitations.teamId': teamId })
         .toArray();
+
       if (Invited.length === 0) {
         const session = client.startSession({
           defaultTransactionOptions: {
@@ -50,24 +61,29 @@ const sendInvite = async (_, args, context) => {
             readPreference: 'primary',
           },
         });
+
         try {
           await session.withTransaction(async () => {
             const usersCollection = db.collection('users');
             const teamsCollection = db.collection('teams');
 
-            await usersCollection.updateOne(
+            const userRes = usersCollection.updateOne(
               { _id: arId },
               { $push: { teamInvitations: { teamId, eventId, invitedBy: id } } },
               { session }
             );
-            await teamsCollection.updateOne(
+            const teamRes = teamsCollection.updateOne(
               { event: eventId, _id: teamId },
               { $push: { pendingInvitations: arId } },
               { session }
             );
+
+            return Promise.all([userRes, teamRes]);
           });
         } catch (err) {
           throw new ApolloError('Something went wrong', 'TRX_FAILED');
+        } finally {
+          await session.endSession();
         }
         return {
           code: 200,
