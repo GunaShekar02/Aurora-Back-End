@@ -1,7 +1,13 @@
 const jwt = require('jsonwebtoken');
+const DataLoader = require('dataloader');
 const { jwtSecret } = require('./utils/config');
 
+const { batchUsers } = require('./resolvers/custom/loaders/userLoader');
+// const { batchTeams } = require('./resolvers/custom/loaders/teamLoader');
+
 const provideContext = (request, database, client) => {
+  const userLoader = new DataLoader(ids => batchUsers(ids, database));
+  // const teamLoader = new DataLoader(teamIds => batchTeams(teamIds, database));
   const { req } = request;
   const payload = {
     isValid: false,
@@ -10,6 +16,7 @@ const provideContext = (request, database, client) => {
     id: null,
     db: database,
     client,
+    userLoader,
   };
   const authHeader = req.headers.authorization || null;
 
@@ -27,5 +34,6 @@ const provideContext = (request, database, client) => {
   }
   return payload;
 };
+
 
 module.exports = provideContext;
