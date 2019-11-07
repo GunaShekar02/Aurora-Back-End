@@ -4,8 +4,8 @@ const batchTeams = async (ids, db) => {
     .collection('teams')
     .find({ _id: { $in: ids } })
     .toArray();
-  console.log('teams from bT', teams);
-  //should group them first
+  // console.log('teams from bT', teams);
+  // should group them first
   // const gU = _.groupBy(users, )
   // const mapperUsers = newIds.map(id => )
   return teams;

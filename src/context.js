@@ -3,11 +3,13 @@ const DataLoader = require('dataloader');
 const { jwtSecret } = require('./utils/config');
 
 const { batchUsers } = require('./resolvers/custom/loaders/userLoader');
-// const { batchTeams } = require('./resolvers/custom/loaders/teamLoader');
+const { batchTeams } = require('./resolvers/custom/loaders/teamLoader');
+const { batchEvents } = require('./resolvers/custom/loaders/eventLoader');
 
 const provideContext = (request, database, client) => {
   const userLoader = new DataLoader(ids => batchUsers(ids, database));
-  // const teamLoader = new DataLoader(teamIds => batchTeams(teamIds, database));
+  const teamLoader = new DataLoader(teamIds => batchTeams(teamIds, database));
+  const eventLoader = new DataLoader(eventIds => batchEvents(eventIds, database));
   const { req } = request;
   const payload = {
     isValid: false,
@@ -17,6 +19,8 @@ const provideContext = (request, database, client) => {
     db: database,
     client,
     userLoader,
+    teamLoader,
+    eventLoader,
   };
   const authHeader = req.headers.authorization || null;
 
@@ -34,6 +38,5 @@ const provideContext = (request, database, client) => {
   }
   return payload;
 };
-
 
 module.exports = provideContext;
