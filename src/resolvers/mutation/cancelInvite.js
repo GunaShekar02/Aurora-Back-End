@@ -56,10 +56,7 @@ const cancelInvite = async (_, args, context) => {
       code: 200,
       success: true,
       message: 'Invite cancelled',
-      team: {
-        id: teamId,
-        ...team[0],
-      },
+      team: { teamId },
     };
   }
   throw new AuthenticationError('User is not logged in');

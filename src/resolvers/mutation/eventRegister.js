@@ -81,7 +81,7 @@ const eventRegister = async (_, args, context) => {
         code: 200,
         success: true,
         message: 'User registered successfully',
-        team: { id: teamId, paymentStatus: false },
+        team: { teamId },
       };
     }
     throw new Error('You are already registered for this event');

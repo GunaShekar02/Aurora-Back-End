@@ -46,9 +46,7 @@ const declineInvite = async (_, args, context) => {
       code: 200,
       success: true,
       message: 'Invite declined',
-      team: {
-        id: teamId,
-      },
+      team: { teamId },
     };
   }
   throw new AuthenticationError('User is not logged in');

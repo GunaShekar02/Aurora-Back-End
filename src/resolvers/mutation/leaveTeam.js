@@ -72,9 +72,7 @@ const leaveTeam = async (_, args, context) => {
       code: 200,
       success: true,
       message: 'Left from team',
-      team: {
-        id: teamId,
-      },
+      team: { teamId },
     };
   }
   throw new AuthenticationError('User is not logged in');

@@ -1,32 +1,43 @@
 const User = {
   name: async (args, __, { userLoader }) => {
     const { id } = args;
-    console.log(id);
     const user = await userLoader.load(id);
-    console.log('user =>', user);
     return user.name;
+  },
+  email: async (args, __, { userLoader }) => {
+    const { id } = args;
+    const user = await userLoader.load(id);
+    return user.email;
   },
   college: async (args, __, { userLoader }) => {
     const { id } = args;
-    // console.log(id);
     const user = await userLoader.load(id);
-    // console.log('user =>', user);
     return user.college;
   },
   isVerified: async (args, __, { userLoader }) => {
     const { id } = args;
-    // console.log(id);
     const user = await userLoader.load(id);
-    // console.log('user =>', user);
     return user.isVerified;
   },
   teams: async (args, __, { userLoader }) => {
     const { id } = args;
-    console.log('sdff');
     const user = await userLoader.load(id);
-    // TeamLoader
-    // console.log('user =>', user);
-    return { name: "abcd" };
+    return user.teams;
+  },
+  phone: async (args, __, { userLoader }) => {
+    const { id } = args;
+    const user = await userLoader.load(id);
+    return user.phone;
+  },
+  accommodation: async (args, __, { userLoader }) => {
+    const { id } = args;
+    const user = await userLoader.load(id);
+    return user.accommodation;
+  },
+  teamInvitations: async (args, __, { userLoader }) => {
+    const { id } = args;
+    const user = await userLoader.load(id);
+    return user.teamInvitations;
   },
 };
 

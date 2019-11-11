@@ -89,11 +89,7 @@ const sendInvite = async (_, args, context) => {
           code: 200,
           success: true,
           message: 'Invite sent successfully',
-          team: {
-            id: teamId,
-            ...team[0],
-            event: { id: eventId },
-          },
+          team: { teamId },
         };
       }
       throw new ApolloError('Already Invited');

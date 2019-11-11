@@ -75,9 +75,7 @@ const acceptInvite = async (_, args, context) => {
       code: 200,
       success: true,
       message: 'Invite accepted',
-      team: {
-        id: teamId,
-      },
+      team: { teamId },
     };
   }
   throw new AuthenticationError('User is not logged in');

@@ -10,6 +10,7 @@ const provideContext = (request, database, client) => {
   const userLoader = new DataLoader(ids => batchUsers(ids, database));
   const teamLoader = new DataLoader(teamIds => batchTeams(teamIds, database));
   const eventLoader = new DataLoader(eventIds => batchEvents(eventIds, database));
+
   const { req } = request;
   const payload = {
     isValid: false,
