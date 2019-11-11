@@ -1,24 +1,22 @@
 const { ApolloError, AuthenticationError } = require('apollo-server-express');
 
 const cancelInvite = async (_, args, context) => {
-  const { isValid, db, client, id } = context;
+  const { isValid, db, client, id, teamLoader } = context;
   if (isValid) {
     const { teamId, arId } = args;
 
-    const team = await db
-      .collection('teams')
-      .find({ _id: teamId, members: id })
-      .toArray();
+    const team = await teamLoader.load(teamId);
+    if (!team) throw new ApolloError('Team does not exist', 'INVALID_TEAM');
 
-    if (team.length === 0)
+    const verifyMember = team.members.filter(member => member === id);
+
+    if (verifyMember.length === 0)
       throw new ApolloError('You should be a member of the team to cancel Invite');
 
-    const verifyInvite = await db
-      .collection('teams')
-      .find({ _id: teamId, pendingInvitations: arId })
-      .toArray();
+    const verifyInvite = team.pendingInvitations.filter(invite => invite.id === arId);
 
-    if (verifyInvite.length === 0) throw new ApolloError('User not invited before');
+    if (verifyInvite.length === 0)
+      throw new ApolloError('User not invited before', 'USR_NOT_INVITED');
 
     const session = client.startSession({
       defaultTransactionOptions: {
@@ -41,7 +39,7 @@ const cancelInvite = async (_, args, context) => {
         );
         const teamRes = teamsCollection.updateOne(
           { _id: teamId, members: id },
-          { $pull: { pendingInvitations: arId } },
+          { $pull: { pendingInvitations: { id: arId } } },
           { session }
         );
 
@@ -50,6 +48,7 @@ const cancelInvite = async (_, args, context) => {
     } catch (err) {
       throw new ApolloError('Something went wrong', 'TRX_FAILED');
     } finally {
+      teamLoader.clear(teamId);
       await session.endSession();
     }
     return {

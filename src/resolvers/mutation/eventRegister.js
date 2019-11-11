@@ -1,27 +1,23 @@
 const { ApolloError, AuthenticationError } = require('apollo-server-express');
 
 const { generateTeamId } = require('../../utils/helpers');
+const eventData = require('../../data/eventData');
 
 const eventRegister = async (_, args, context) => {
-  const { isValid, db, client } = context;
+  const { isValid, db, client, logger } = context;
   const userId = context.id;
   const { eventId } = args;
   let teamId;
 
   if (isValid) {
-    const singleEvent = await db
-      .collection('events')
-      .find({ _id: eventId })
-      .toArray();
-
-    if (singleEvent.length === 0) throw new ApolloError('wrong Event Details');
+    if (eventData.get(eventId) === undefined)
+      throw new ApolloError('Wrong Event Details', 'WRONG_DETAILS');
 
     const verifyRegister = await db
       .collection('teams')
-      .find({ event: eventId, members: userId })
-      .toArray();
+      .findOne({ event: eventId, members: userId });
 
-    if (verifyRegister.length === 0) {
+    if (!verifyRegister) {
       const invites = await db
         .collection('users')
         .aggregate([
@@ -31,6 +27,7 @@ const eventRegister = async (_, args, context) => {
           { $project: { teamInvitations: 1 } },
         ])
         .toArray();
+      const inviteIds = invites.map(invite => invite.teamInvitations.teamId);
 
       const session = client.startSession({
         defaultTransactionOptions: {
@@ -62,17 +59,25 @@ const eventRegister = async (_, args, context) => {
             { $push: { teams: { teamId, eventId } } },
             { session }
           );
-          const invitePromises = invites.map(invite => {
-            return usersCollection.updateOne(
-              { _id: userId },
-              { $pull: { teamInvitations: { teamId: invite.teamInvitations.teamId } } },
-              { session }
-            );
-          });
+          const inviteRes = usersCollection.updateOne(
+            { _id: userId },
+            { $pull: { teamInvitations: { teamId: { $in: inviteIds } } } },
+            { session }
+          );
 
-          return Promise.all(invitePromises.concat([teamRes, userRes]));
+          return Promise.all([teamRes, userRes, inviteRes]);
         });
+        logger('[INFO]', '[eventRegister]', 'userId:', userId, 'eventId:', eventId);
       } catch (err) {
+        logger(
+          '[ERROR]',
+          '[eventRegister]',
+          'transaction failed',
+          'userId:',
+          userId,
+          'eventId:',
+          eventId
+        );
         throw new ApolloError('Something went wrong', 'TRX_FAILED');
       } finally {
         await session.endSession();
@@ -84,7 +89,7 @@ const eventRegister = async (_, args, context) => {
         team: { teamId },
       };
     }
-    throw new Error('You are already registered for this event');
+    throw new ApolloError('You are already registered for this event', 'ALREADY_REG');
   }
   throw new AuthenticationError('User is not logged in');
 };
