@@ -56,7 +56,7 @@ const acceptInvite = async (_, args, context) => {
         return Promise.all([userRes, teamRes, inviteRes]);
       });
     } catch (err) {
-      logger('[ERR]', err);
+      logger('[TRX_ERR]', err);
       throw new ApolloError('Something went wrong', 'TRX_FAILED');
     } finally {
       userLoader.clear(id);

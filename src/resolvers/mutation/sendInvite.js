@@ -15,14 +15,12 @@ const sendInvite = async (_, args, context) => {
 
     const { maxSize } = eventData.get(eventId);
 
-    const RegisteredUser = await db
-      .collection('users')
-      .findOne({ _id: id, 'teams.eventId': eventId });
+    const [registeredUser, receiverUser] = await userLoader.loadMany([id, arId]);
+    const verifyRegister = registeredUser.teams.some(userTeam => userTeam.eventId === eventId);
 
-    if (!RegisteredUser) {
+    if (!verifyRegister) {
       throw new ApolloError('You are not registered for the event to invite', 'EVT_NOT_REG');
     }
-    const receiverUser = await userLoader.load(arId);
 
     if (!receiverUser) throw new ApolloError('User does not exist', 'USER_DOES_NOT_EXIST');
 
@@ -65,7 +63,7 @@ const sendInvite = async (_, args, context) => {
             return Promise.all([userRes, teamRes]);
           });
         } catch (err) {
-          logger('[ERR]', err);
+          logger('[TRX_ERR]', err);
           throw new ApolloError('Something went wrong', 'TRX_FAILED');
         } finally {
           userLoader.clear(arId);

@@ -8,16 +8,13 @@ const login = async (_, args, context) => {
   const { db } = context;
   const { email, password } = args;
 
-  const user = await db
-    .collection('users')
-    .find({ email })
-    .toArray();
-  if (user.length !== 0) {
-    const match = await bcrypt.compare(password, user[0].hash);
+  const user = await db.collection('users').findOne({ email });
+  if (user) {
+    const match = await bcrypt.compare(password, user.hash);
     if (match) {
       const payload = {
-        email: user[0].email,
-        id: user[0]._id,
+        email: user.email,
+        id: user._id,
       };
       const token = jwt.sign(payload, jwtSecret.privKey, {
         algorithm: 'ES512',

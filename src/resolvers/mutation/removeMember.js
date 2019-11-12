@@ -1,17 +1,24 @@
 const { ApolloError, AuthenticationError } = require('apollo-server-express');
 
-const declineInvite = async (_, args, context) => {
-  const { isValid, db, client, id } = context;
+const removeMember = async (_, args, context) => {
+  const { isValid, db, client, id, logger, teamLoader } = context;
 
   if (isValid) {
     const { teamId, arId } = args;
-    const team = await db
-      .collection('teams')
-      .find({ _id: teamId, members: [id, arId] })
-      .toArray();
 
-    if (team.length === 0)
-      throw new ApolloError('Either You  or the user is not a member of this team');
+    if (arId === id)
+      throw new ApolloError('You cannot remove yourself from team.', 'CANNOT_REMOVE_YOURSELF');
+
+    const team = await teamLoader.load(teamId);
+
+    if (!team) throw new ApolloError('Invalid team', 'INVALID_TEAM');
+
+    const verifyMember = team.members.some(member => member === id);
+    if (!verifyMember) throw new ApolloError('You are not a member of this team', 'NOT_A_MEMBER');
+
+    const verifyReceiver = team.members.some(member => member === arId);
+    if (!verifyReceiver)
+      throw new ApolloError('User is not a member of this team', 'USR_NOT_A_MEMBER');
 
     const session = client.startSession({
       defaultTransactionOptions: {
@@ -39,8 +46,10 @@ const declineInvite = async (_, args, context) => {
         return Promise.all([userRes, teamRes]);
       });
     } catch (err) {
+      logger('[TRX_ERR]', err);
       throw new ApolloError('Something went wrong', 'TRX_FAILED');
     } finally {
+      teamLoader.clear(teamId);
       await session.endSession();
     }
     return {
@@ -53,4 +62,4 @@ const declineInvite = async (_, args, context) => {
   throw new AuthenticationError('User is not logged in');
 };
 
-module.exports = declineInvite;
+module.exports = removeMember;

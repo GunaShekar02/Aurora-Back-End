@@ -69,7 +69,7 @@ const eventRegister = async (_, args, context) => {
         });
         logger('[INFO]', '[eventRegister]', 'userId:', userId, 'eventId:', eventId);
       } catch (err) {
-        logger('[ERR]', err);
+        logger('[TRX_ERR]', err);
         throw new ApolloError('Something went wrong', 'TRX_FAILED');
       } finally {
         await session.endSession();

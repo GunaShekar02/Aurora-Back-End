@@ -44,7 +44,7 @@ const cancelInvite = async (_, args, context) => {
         return Promise.all([userRes, teamRes]);
       });
     } catch (err) {
-      logger('[ERR]', err);
+      logger('[TRX_ERR]', err);
       throw new ApolloError('Something went wrong', 'TRX_FAILED');
     } finally {
       teamLoader.clear(teamId);
