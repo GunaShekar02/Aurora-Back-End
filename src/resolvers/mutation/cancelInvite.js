@@ -1,22 +1,20 @@
 const { ApolloError, AuthenticationError } = require('apollo-server-express');
 
 const cancelInvite = async (_, args, context) => {
-  const { isValid, db, client, id, teamLoader } = context;
+  const { isValid, db, client, id, teamLoader, logger } = context;
   if (isValid) {
     const { teamId, arId } = args;
 
     const team = await teamLoader.load(teamId);
     if (!team) throw new ApolloError('Team does not exist', 'INVALID_TEAM');
 
-    const verifyMember = team.members.filter(member => member === id);
+    const verifyMember = team.members.some(member => member === id);
 
-    if (verifyMember.length === 0)
-      throw new ApolloError('You should be a member of the team to cancel Invite');
+    if (!verifyMember) throw new ApolloError('You should be a member of the team to cancel Invite');
 
-    const verifyInvite = team.pendingInvitations.filter(invite => invite.id === arId);
+    const verifyInvite = team.pendingInvitations.some(invite => invite.id === arId);
 
-    if (verifyInvite.length === 0)
-      throw new ApolloError('User not invited before', 'USR_NOT_INVITED');
+    if (!verifyInvite) throw new ApolloError('User not invited before', 'USR_NOT_INVITED');
 
     const session = client.startSession({
       defaultTransactionOptions: {
@@ -46,6 +44,7 @@ const cancelInvite = async (_, args, context) => {
         return Promise.all([userRes, teamRes]);
       });
     } catch (err) {
+      logger('[ERR]', err);
       throw new ApolloError('Something went wrong', 'TRX_FAILED');
     } finally {
       teamLoader.clear(teamId);

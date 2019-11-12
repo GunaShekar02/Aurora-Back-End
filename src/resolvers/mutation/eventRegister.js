@@ -59,7 +59,7 @@ const eventRegister = async (_, args, context) => {
             { $push: { teams: { teamId, eventId } } },
             { session }
           );
-          const inviteRes = usersCollection.updateOne(
+          const inviteRes = usersCollection.updateMany(
             { _id: userId },
             { $pull: { teamInvitations: { teamId: { $in: inviteIds } } } },
             { session }
@@ -69,15 +69,7 @@ const eventRegister = async (_, args, context) => {
         });
         logger('[INFO]', '[eventRegister]', 'userId:', userId, 'eventId:', eventId);
       } catch (err) {
-        logger(
-          '[ERROR]',
-          '[eventRegister]',
-          'transaction failed',
-          'userId:',
-          userId,
-          'eventId:',
-          eventId
-        );
+        logger('[ERR]', err);
         throw new ApolloError('Something went wrong', 'TRX_FAILED');
       } finally {
         await session.endSession();

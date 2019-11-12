@@ -2,7 +2,7 @@ const { ApolloError, AuthenticationError } = require('apollo-server-express');
 const eventData = require('../../data/eventData');
 
 const sendInvite = async (_, args, context) => {
-  const { isValid, db, client, id, userLoader } = context;
+  const { isValid, db, client, id, userLoader, logger } = context;
 
   if (isValid) {
     const { teamId, arId } = args;
@@ -26,18 +26,18 @@ const sendInvite = async (_, args, context) => {
 
     if (!receiverUser) throw new ApolloError('User does not exist', 'USER_DOES_NOT_EXIST');
 
-    const alreadyRegistered = receiverUser.teams.filter(userTeam => userTeam.eventId === eventId);
+    const alreadyRegistered = receiverUser.teams.some(userTeam => userTeam.eventId === eventId);
 
-    if (alreadyRegistered.length !== 0) {
+    if (alreadyRegistered) {
       throw new ApolloError(
         'The user is already in some other team for the same event',
         'USR_ALREADY_REG'
       );
     }
     if (team.members.length + team.pendingInvitations.length < maxSize) {
-      const Invited = receiverUser.teamInvitations.filter(invite => invite.teamId === teamId);
+      const alreadyInvited = receiverUser.teamInvitations.some(invite => invite.teamId === teamId);
 
-      if (Invited.length === 0) {
+      if (!alreadyInvited) {
         const session = client.startSession({
           defaultTransactionOptions: {
             readConcern: { level: 'local' },
@@ -65,6 +65,7 @@ const sendInvite = async (_, args, context) => {
             return Promise.all([userRes, teamRes]);
           });
         } catch (err) {
+          logger('[ERR]', err);
           throw new ApolloError('Something went wrong', 'TRX_FAILED');
         } finally {
           userLoader.clear(arId);
