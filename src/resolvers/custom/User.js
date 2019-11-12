@@ -37,7 +37,16 @@ const User = {
   teamInvitations: async (args, __, { userLoader }) => {
     const { id } = args;
     const user = await userLoader.load(id);
-    return user.teamInvitations;
+    return user.teamInvitations.map(invite => {
+      return {
+        team: {
+          teamId: invite.teamId,
+        },
+        invitedBy: {
+          id: invite.invitedBy,
+        },
+      };
+    });
   },
 };
 

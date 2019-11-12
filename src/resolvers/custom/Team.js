@@ -1,23 +1,26 @@
 const Team = {
-  name: async (args, __, { teamLoader }) => {
-    const team = await teamLoader.load(args.teamId);
+  name: async ({ teamId }, __, { teamLoader }) => {
+    const team = await teamLoader.load(teamId);
     return team.name;
   },
-  id: async args => args.teamId,
 
-  members: async (args, __, { teamLoader }) => {
-    const team = await teamLoader.load(args.teamId);
+  id: async ({ teamId }) => teamId,
+
+  members: async ({ teamId }, __, { teamLoader }) => {
+    const team = await teamLoader.load(teamId);
     const members = team.members.map(member => {
       return { id: member };
     });
     return members;
   },
-  event: async (args, __, { teamLoader }) => {
-    const team = await teamLoader.load(args.teamId);
-    return team.event;
+
+  event: async ({ teamId }, __, { teamLoader }) => {
+    const team = await teamLoader.load(teamId);
+    return { id: team.event };
   },
-  paymentStatus: async (args, __, { teamLoader }) => {
-    const team = await teamLoader.load(args.teamId);
+
+  paymentStatus: async ({ teamId }, __, { teamLoader }) => {
+    const team = await teamLoader.load(teamId);
     return team.paymentStatus;
   },
 };

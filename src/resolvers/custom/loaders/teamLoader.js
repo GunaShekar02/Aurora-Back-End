@@ -1,4 +1,6 @@
-const batchTeams = async (ids, db) => {
+const batchTeams = async (ids, db, logger) => {
+  logger('fetching teamIds=>', ids);
+
   const teams = await db
     .collection('teams')
     .find({ _id: { $in: ids } })

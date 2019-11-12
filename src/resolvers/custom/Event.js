@@ -1,19 +1,17 @@
+const eventData = require('../../data/eventData');
+
 const Event = {
-  name: async (args, __, { eventLoader }) => {
-    const event = await eventLoader.load(args);
+  name: async ({ id }) => {
+    const event = eventData.get(id);
     return event.name;
   },
-  fee: async (args, __, { eventLoader }) => {
-    const event = await eventLoader.load(args);
+  fee: async ({ id }) => {
+    const event = eventData.get(id);
     return event.fee;
   },
-  id: async (args, __, { eventLoader }) => {
-    const event = await eventLoader.load(args);
-    return event._id;
-  },
-  maxSize: async (args, __, { eventLoader }) => {
-    const event = await eventLoader.load(args);
-    return event._id;
+  maxSize: async ({ id }) => {
+    const event = eventData.get(id);
+    return event.maxSize;
   },
 };
 

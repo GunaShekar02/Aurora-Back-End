@@ -4,7 +4,7 @@ const data = [
     {
       id: 1,
       name: 'Event-1',
-      fees: 400,
+      fee: 400,
       maxSize: 3,
     },
   ],
@@ -13,7 +13,7 @@ const data = [
     {
       id: 2,
       name: 'Event-2',
-      fees: 300,
+      fee: 300,
       maxSize: 3,
     },
   ],

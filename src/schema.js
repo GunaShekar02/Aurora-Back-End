@@ -2,7 +2,6 @@ const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
   type Query {
-    events: [Event!]
     user: User!
   }
 
@@ -22,7 +21,7 @@ const typeDefs = gql`
     isVerified: Boolean!
     accommodation: Boolean!
     teams: [Team!]
-    teamInvitations: [Team!]
+    teamInvitations: [TeamInvitation!]
   }
 
   type Team {
@@ -31,6 +30,12 @@ const typeDefs = gql`
     event: Event!
     members: [User!]!
     paymentStatus: Boolean!
+    pendingInvitation: [User!]
+  }
+
+  type TeamInvitation {
+    team: Team!
+    invitedBy: User!
   }
 
   type Mutation {

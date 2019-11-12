@@ -9,8 +9,8 @@ const { batchEvents } = require('./resolvers/custom/loaders/eventLoader');
 
 const provideContext = (request, database, client) => {
   const userLoader = new DataLoader(ids => batchUsers(ids, database, logger));
-  const teamLoader = new DataLoader(teamIds => batchTeams(teamIds, database));
-  const eventLoader = new DataLoader(eventIds => batchEvents(eventIds, database));
+  const teamLoader = new DataLoader(teamIds => batchTeams(teamIds, database, logger));
+  const eventLoader = new DataLoader(eventIds => batchEvents(eventIds, database, logger));
 
   const { req } = request;
   const payload = {
@@ -27,6 +27,8 @@ const provideContext = (request, database, client) => {
   };
   const authHeader = req.headers.authorization || null;
 
+  logger('\n-------------------------REQUEST--------------------------');
+
   if (authHeader) {
     const token = authHeader.replace('bearer ', '');
 
@@ -36,9 +38,12 @@ const provideContext = (request, database, client) => {
         payload.token = token;
         payload.email = decoded.email;
         payload.id = decoded.id;
+
+        logger('userId=>', decoded.id, 'email=>', decoded.email, '\n');
       }
     });
   }
+
   return payload;
 };
 

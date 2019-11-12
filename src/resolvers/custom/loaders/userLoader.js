@@ -1,5 +1,5 @@
 const batchUsers = async (ids, db, logger) => {
-  logger('fetch ids=>', ids);
+  logger('fetching userIds=>', ids);
   const users = await db
     .collection('users')
     .find({ _id: { $in: ids } })
@@ -15,9 +15,6 @@ const batchUsers = async (ids, db, logger) => {
     if (userIndex === undefined) return null;
     return users[userIndex];
   });
-
-  logger('got users=>', users);
-  logger('sorted users=>', sortedUsers);
 
   return sortedUsers;
 };
