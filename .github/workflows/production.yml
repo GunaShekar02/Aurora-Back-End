@@ -21,6 +21,15 @@ jobs:
         run: |
           echo "$PROD_ENV" | base64 -d > .env
 
+      - name: Setup JWT keys
+        env:
+          JWT_PRIVATE: ${{ secrets.JWT_PRIVATE }}
+          JWT_PUBLIC: ${{ secrets.JWT_PUBLIC }}
+        run: |
+          mkdir keys
+          echo "$JWT_PRIVATE" | base64 -d > keys/ecd.pem
+          echo "$JWT_PUBLIC" | base64 -d > keys/ecd.pub.pem
+
       - name: Setup key
         env:
           ECD_KEY: ${{ secrets.ECD_KEY }}
