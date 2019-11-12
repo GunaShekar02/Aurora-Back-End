@@ -1,25 +1,19 @@
 const { ApolloError, AuthenticationError } = require('apollo-server-express');
 
 const leaveTeam = async (_, args, context) => {
-  const { isValid, db, client, id } = context;
+  const { isValid, db, client, id, teamLoader, logger } = context;
 
   if (isValid) {
     const { teamId } = args;
-    const team = await db
-      .collection('teams')
-      .find({ _id: teamId, members: id })
-      .toArray();
 
-    if (team.length === 0) throw new ApolloError('You are not a member of this team');
+    const team = await teamLoader.load(teamId);
+    if (!team) throw new ApolloError('Invalid team', 'INVALID_TEAM');
 
-    const invites = await db
-      .collection('teams')
-      .aggregate([
-        { $match: { _id: teamId } },
-        { $unwind: '$pendingInvitations' },
-        { $project: { pendingInvitations: 1 } },
-      ])
-      .toArray();
+    const verifyMember = team.members.some(member => member === id);
+
+    if (!verifyMember) throw new ApolloError('You are not a member of this team', 'NOT_A_MEMBER');
+
+    const invites = team.pendingInvitations.map(invite => invite.id);
 
     const session = client.startSession({
       defaultTransactionOptions: {
@@ -40,18 +34,16 @@ const leaveTeam = async (_, args, context) => {
           { session }
         );
 
-        if (team[0].members.length === 1) {
-          const invitePromises = invites.map(invite => {
-            return usersCollection.updateOne(
-              { _id: invite.pendingInvitations },
-              { $pull: { teamInvitations: { teamId: invite._id } } },
-              { session }
-            );
-          });
+        if (team.members.length === 1) {
+          const inviteRes = usersCollection.updateMany(
+            { _id: { $in: invites } },
+            { $pull: { teamInvitations: { teamId } } },
+            { session }
+          );
 
           const teamRes = teamsCollection.deleteOne({ _id: teamId }, { session });
 
-          return Promise.all(invitePromises.concat([userRes, teamRes]));
+          return Promise.all([userRes, teamRes, inviteRes]);
         }
 
         const teamRes = teamsCollection.updateOne(
@@ -63,8 +55,10 @@ const leaveTeam = async (_, args, context) => {
         return Promise.all([userRes, teamRes]);
       });
     } catch (err) {
+      logger('[TRX_ERR]', err);
       throw new ApolloError('Something went wrong', 'TRX_FAILED');
     } finally {
+      teamLoader.clear(teamId);
       await session.endSession();
     }
 
@@ -72,9 +66,6 @@ const leaveTeam = async (_, args, context) => {
       code: 200,
       success: true,
       message: 'Left from team',
-      team: {
-        id: teamId,
-      },
     };
   }
   throw new AuthenticationError('User is not logged in');

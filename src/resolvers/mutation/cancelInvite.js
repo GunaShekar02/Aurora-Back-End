@@ -1,24 +1,20 @@
 const { ApolloError, AuthenticationError } = require('apollo-server-express');
 
 const cancelInvite = async (_, args, context) => {
-  const { isValid, db, client, id } = context;
+  const { isValid, db, client, id, teamLoader, logger } = context;
   if (isValid) {
     const { teamId, arId } = args;
 
-    const team = await db
-      .collection('teams')
-      .find({ _id: teamId, members: id })
-      .toArray();
+    const team = await teamLoader.load(teamId);
+    if (!team) throw new ApolloError('Team does not exist', 'INVALID_TEAM');
 
-    if (team.length === 0)
-      throw new ApolloError('You should be a member of the team to cancel Invite');
+    const verifyMember = team.members.some(member => member === id);
 
-    const verifyInvite = await db
-      .collection('teams')
-      .find({ _id: teamId, pendingInvitations: arId })
-      .toArray();
+    if (!verifyMember) throw new ApolloError('You should be a member of the team to cancel Invite');
 
-    if (verifyInvite.length === 0) throw new ApolloError('User not invited before');
+    const verifyInvite = team.pendingInvitations.some(invite => invite.id === arId);
+
+    if (!verifyInvite) throw new ApolloError('User not invited before', 'USR_NOT_INVITED');
 
     const session = client.startSession({
       defaultTransactionOptions: {
@@ -41,25 +37,24 @@ const cancelInvite = async (_, args, context) => {
         );
         const teamRes = teamsCollection.updateOne(
           { _id: teamId, members: id },
-          { $pull: { pendingInvitations: arId } },
+          { $pull: { pendingInvitations: { id: arId } } },
           { session }
         );
 
         return Promise.all([userRes, teamRes]);
       });
     } catch (err) {
+      logger('[TRX_ERR]', err);
       throw new ApolloError('Something went wrong', 'TRX_FAILED');
     } finally {
+      teamLoader.clear(teamId);
       await session.endSession();
     }
     return {
       code: 200,
       success: true,
       message: 'Invite cancelled',
-      team: {
-        id: teamId,
-        ...team[0],
-      },
+      team: { teamId },
     };
   }
   throw new AuthenticationError('User is not logged in');

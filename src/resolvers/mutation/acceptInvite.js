@@ -1,33 +1,23 @@
 const { ApolloError, AuthenticationError } = require('apollo-server-express');
 
 const acceptInvite = async (_, args, context) => {
-  const { isValid, db, client, id } = context;
+  const { isValid, db, client, id, userLoader, logger } = context;
 
   if (isValid) {
     const { teamId } = args;
-    const team = await db
-      .collection('teams')
-      .find({ _id: teamId, pendingInvitations: id })
-      .toArray();
+    const team = await db.collection('teams').findOne({ _id: teamId, pendingInvitations: { id } });
 
-    if (team.length === 0) throw new ApolloError('Invalid Team');
+    if (!team) throw new ApolloError('Invalid Team or you are not Invited', 'UNAUTHORIZED');
 
-    const user = await db
-      .collection('users')
-      .find({ _id: id, 'teamInvitations.teamId': teamId })
-      .toArray();
+    const user = await userLoader.load(id);
+    const verifyInvite = user.teamInvitations.some(invite => invite.teamId === teamId);
 
-    if (user.length === 0) throw new ApolloError('You are not invited');
+    if (!verifyInvite) throw new ApolloError('You are not invited', 'USR_NOT_INVITED');
 
-    const invites = await db
-      .collection('users')
-      .aggregate([
-        { $match: { _id: id } },
-        { $unwind: '$teamInvitations' },
-        { $match: { 'teamInvitations.eventId': team[0].event } },
-        { $project: { 'teamInvitations.teamId': 1 } },
-      ])
-      .toArray();
+    const invites = [];
+    user.teamInvitations.forEach(invite => {
+      if (invite.eventId === team.event) invites.push(invite.teamId);
+    });
 
     const session = client.startSession({
       defaultTransactionOptions: {
@@ -45,8 +35,8 @@ const acceptInvite = async (_, args, context) => {
         const userRes = usersCollection.updateOne(
           { _id: id },
           {
-            $push: { teams: { teamId, eventId: team[0].event } },
-            $pull: { teamInvitations: { eventId: team[0].event } },
+            $push: { teams: { teamId, eventId: team.event } },
+            $pull: { teamInvitations: { eventId: team.event } },
           },
           { session }
         );
@@ -57,27 +47,26 @@ const acceptInvite = async (_, args, context) => {
           },
           { session }
         );
-        const invitePromises = invites.map(invite => {
-          return teamsCollection.updateOne(
-            { _id: invite.teamInvitations.teamId },
-            { $pull: { pendingInvitations: id } },
-            { session }
-          );
-        });
-        return Promise.all(invitePromises.concat([userRes, teamRes]));
+        const inviteRes = teamsCollection.updateMany(
+          { _id: { $in: invites } },
+          { $pull: { pendingInvitations: { id } } },
+          { session }
+        );
+
+        return Promise.all([userRes, teamRes, inviteRes]);
       });
     } catch (err) {
+      logger('[TRX_ERR]', err);
       throw new ApolloError('Something went wrong', 'TRX_FAILED');
     } finally {
+      userLoader.clear(id);
       await session.endSession();
     }
     return {
       code: 200,
       success: true,
       message: 'Invite accepted',
-      team: {
-        id: teamId,
-      },
+      team: { teamId },
     };
   }
   throw new AuthenticationError('User is not logged in');

@@ -10,6 +10,8 @@ const declineInvite = require('./resolvers/mutation/declineInvite');
 const removeMember = require('./resolvers/mutation/removeMember');
 const leaveTeam = require('./resolvers/mutation/leaveTeam');
 const User = require('./resolvers/custom/User');
+const Team = require('./resolvers/custom/Team');
+const Event = require('./resolvers/custom/Event');
 
 const resolvers = {
   Query: {
@@ -27,6 +29,8 @@ const resolvers = {
     leaveTeam,
   },
   User,
+  Team,
+  Event,
 };
 
 module.exports = resolvers;

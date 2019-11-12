@@ -7,11 +7,8 @@ const signup = async (_, args, context) => {
   const { db } = context;
   const { email, password, name, college, phone } = args;
 
-  const user = await db
-    .collection('users')
-    .find({ email })
-    .toArray();
-  if (user.length === 0) {
+  const user = await db.collection('users').findOne({ email });
+  if (!user) {
     const arId = await generateArId(name, db);
     const payload = {
       _id: arId,

@@ -1,59 +1,41 @@
 const { ApolloError, AuthenticationError } = require('apollo-server-express');
+const eventData = require('../../data/eventData');
 
 const sendInvite = async (_, args, context) => {
-  const { isValid, db, client, id } = context;
+  const { isValid, db, client, id, userLoader, logger } = context;
 
   if (isValid) {
     const { teamId, arId } = args;
-    const team = await db
-      .collection('teams')
-      .find({ _id: teamId, members: id })
-      .toArray();
+    const team = await db.collection('teams').findOne({ _id: teamId, members: id });
 
-    if (team.length === 0) throw new ApolloError('Invalid team-Id or you are not a team member');
+    if (!team)
+      throw new ApolloError('Invalid team-Id or you are not a team member', 'UNAUTHORIZED');
 
-    const eventId = team[0].event;
+    const eventId = team.event;
 
-    const event = await db
-      .collection('events')
-      .find({ _id: eventId })
-      .toArray();
+    const { maxSize } = eventData.get(eventId);
 
-    const { maxSize } = event[0];
+    const [registeredUser, receiverUser] = await userLoader.loadMany([id, arId]);
+    const verifyRegister = registeredUser.teams.some(userTeam => userTeam.eventId === eventId);
 
-    const RegisteredUser = await db
-      .collection('users')
-      .find({ _id: id, 'teams.eventId': eventId })
-      .toArray();
-
-    if (RegisteredUser.length === 0) {
-      throw new ApolloError('You are not registered for the event to invite');
+    if (!verifyRegister) {
+      throw new ApolloError('You are not registered for the event to invite', 'EVT_NOT_REG');
     }
-    const receiverUser = await db
-      .collection('users')
-      .find({ _id: arId })
-      .toArray();
 
-    if (receiverUser.length === 0) throw new ApolloError('User does not exist');
+    if (!receiverUser) throw new ApolloError('User does not exist', 'USER_DOES_NOT_EXIST');
 
-    const alreadyRegistered = await db
-      .collection('users')
-      .find({
-        _id: arId,
-        'teams.eventId': eventId,
-      })
-      .toArray();
+    const alreadyRegistered = receiverUser.teams.some(userTeam => userTeam.eventId === eventId);
 
-    if (alreadyRegistered.length !== 0) {
-      throw new ApolloError('The user is already in some other team for the same event');
+    if (alreadyRegistered) {
+      throw new ApolloError(
+        'The user is already in some other team for the same event',
+        'USR_ALREADY_REG'
+      );
     }
-    if (team[0].members.length + team[0].pendingInvitations.length < maxSize) {
-      const Invited = await db
-        .collection('users')
-        .find({ _id: arId, 'teamInvitations.teamId': teamId })
-        .toArray();
+    if (team.members.length + team.pendingInvitations.length < maxSize) {
+      const alreadyInvited = receiverUser.teamInvitations.some(invite => invite.teamId === teamId);
 
-      if (Invited.length === 0) {
+      if (!alreadyInvited) {
         const session = client.startSession({
           defaultTransactionOptions: {
             readConcern: { level: 'local' },
@@ -74,30 +56,28 @@ const sendInvite = async (_, args, context) => {
             );
             const teamRes = teamsCollection.updateOne(
               { event: eventId, _id: teamId },
-              { $push: { pendingInvitations: arId } },
+              { $push: { pendingInvitations: { id: arId } } },
               { session }
             );
 
             return Promise.all([userRes, teamRes]);
           });
         } catch (err) {
+          logger('[TRX_ERR]', err);
           throw new ApolloError('Something went wrong', 'TRX_FAILED');
         } finally {
+          userLoader.clear(arId);
           await session.endSession();
         }
         return {
           code: 200,
           success: true,
           message: 'Invite sent successfully',
-          team: {
-            id: teamId,
-            ...team[0],
-            event: { id: eventId },
-          },
+          team: { teamId },
         };
       }
-      throw new ApolloError('Already Invited');
-    } else throw new ApolloError('You cannot make any more invites');
+      throw new ApolloError('Already Invited', 'ALREADY_INVITED');
+    } else throw new ApolloError('You cannot make any more invites', 'INVITE_LIMIT_REACHED');
   } else throw new AuthenticationError('User is not logged in');
 };
 
