@@ -46,16 +46,17 @@ const typeDefs = gql`
       name: String!
       college: String!
       phone: String!
-    ): MutationResponse
-    verify(email: String!, code: String!): MutationResponse
+    ): UserResponse
+    verify(email: String!, code: String!): UserResponse
     eventRegister(eventId: Int!): EventResponse
     sendInvite(teamId: String!, arId: String!): EventResponse
     cancelInvite(teamId: String!, arId: String!): EventResponse
     acceptInvite(teamId: String!): EventResponse
-    declineInvite(teamId: String!): MutationResponse
+    declineInvite(teamId: String!): UserResponse
     removeMember(teamId: String!, arId: String!): EventResponse
-    leaveTeam(teamId: String!): MutationResponse
-    pay(teamId: String!): MutationResponse
+    leaveTeam(teamId: String!): UserResponse
+    pay(teamId: String!): UserResponse
+    contactUs(name: String!, email: String!, message: String!): MutationResponse
   }
 
   type EventResponse {
@@ -66,6 +67,12 @@ const typeDefs = gql`
   }
 
   type MutationResponse {
+    code: String
+    success: Boolean!
+    message: String
+  }
+
+  type UserResponse {
     code: String
     success: Boolean!
     message: String
