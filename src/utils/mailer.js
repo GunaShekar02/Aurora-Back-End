@@ -17,9 +17,9 @@ const mailer = async options => {
     subject: 'Verify your email to complete registration',
   };
 
-  const transporter = nodemailer.createTransport(smtpCreds);
-
   try {
+    const transporter = nodemailer.createTransport(smtpCreds);
+
     const info = await transporter.sendMail({
       ...defaultOptions,
       ...options,
