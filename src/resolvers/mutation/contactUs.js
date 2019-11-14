@@ -2,9 +2,9 @@ const mailer = require('../../utils/mailer');
 const getContactEmail = require('../../utils/emails/contactUs');
 
 const contactUs = async (_, args, { logger }) => {
-  const { name, email, message } = args;
+  const { name, email, subject, message } = args;
 
-  const emailContent = getContactEmail(name, email, message);
+  const emailContent = getContactEmail(name, email, subject, message);
   logger('[CONTACT_US]', { name, email });
 
   const mailOptions = {

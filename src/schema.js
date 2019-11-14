@@ -56,7 +56,7 @@ const typeDefs = gql`
     removeMember(teamId: String!, arId: String!): EventResponse
     leaveTeam(teamId: String!): UserResponse
     pay(teamId: String!): UserResponse
-    contactUs(name: String!, email: String!, message: String!): MutationResponse
+    contactUs(name: String!, email: String!, subject: String, message: String!): MutationResponse
   }
 
   type EventResponse {
