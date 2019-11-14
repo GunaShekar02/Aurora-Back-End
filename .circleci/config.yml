@@ -1,0 +1,32 @@
+version: 2.1
+
+workflows:
+  test:
+    jobs:
+      - lint
+
+jobs:
+  lint:
+    docker:
+      - image: circleci/node:10.16.0
+    steps:
+      - checkout
+
+      - restore_cache:
+         keys:
+           - v1-dependencies-{{ checksum "package.json" }}
+           # fallback to latest cache if exact match not found
+           - v1-dependencies-
+
+      - run:
+         name: Install dependencies
+         command: yarn
+
+      - run:
+         name: Run lint tests
+         command: yarn lint:ci
+
+      - save_cache:
+         key: v1-dependencies-{{ checksum "package.json" }}
+         paths:
+           - "node_modules"

@@ -1,9 +1,49 @@
 const express = require('express');
+const cors = require('cors');
+const { MongoClient } = require('mongodb');
+const { ApolloServer } = require('apollo-server-express');
+
+const typeDefs = require('./schema');
+const resolvers = require('./resolvers');
+const provideContext = require('./context');
+
+const config = require('./utils/config');
 
 const app = express();
+app.use(cors());
 
-const port = process.env.PORT || 3001;
+MongoClient.connect(config.dbHost, {
+  auth: {
+    user: config.dbUser,
+    password: config.dbPass,
+    authSource: config.dbName,
+  },
+  replicaSet: config.dbReplSet,
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+  .then(client => {
+    const db = client.db(config.dbName);
 
-app.get('/', (req,res) => res.send("Hello World"));
+    const server = new ApolloServer({
+      typeDefs,
+      resolvers,
+      context: req => provideContext(req, db, client),
+      tracing: true,
+    });
 
-app.listen(port, () => console.log(`Example app listening on port ${port}`));
+    const port = config.port || 3001;
+
+    app.get('/api', (_req, res) => res.send('it is working.'));
+
+    server.applyMiddleware({ app, path: '/api/graphql' });
+
+    app.listen(port, () =>
+      // eslint-disable-next-line no-console
+      console.log(`API server ready at http://localhost:${port}${server.graphqlPath}`)
+    );
+  })
+  .catch(err => {
+    // eslint-disable-next-line no-console
+    console.log('I caught something', err);
+  });

@@ -1,0 +1,44 @@
+name: Deploy on production server
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          ref: master
+          fetch-depth: 1
+
+      - name: Setup .env file
+        env:
+          PROD_ENV: ${{ secrets.PROD_ENV }}
+        run: |
+          echo "$PROD_ENV" | base64 -d > .env
+
+      - name: Setup JWT keys
+        env:
+          JWT_PRIVATE: ${{ secrets.JWT_PRIVATE }}
+          JWT_PUBLIC: ${{ secrets.JWT_PUBLIC }}
+        run: |
+          mkdir keys
+          echo "$JWT_PRIVATE" | base64 -d > keys/ecd.pem
+          echo "$JWT_PUBLIC" | base64 -d > keys/ecd.pub.pem
+
+      - name: Setup key
+        env:
+          ECD_KEY: ${{ secrets.ECD_KEY }}
+        run: |
+          echo "$ECD_KEY" | base64 -d > $HOME/ecd
+          chmod 400 $HOME/ecd
+
+      - name: Push the build to server
+        run: rsync -avz --delete --exclude 'node_modules' --exclude '.git*' -e "ssh -i $HOME/ecd -o StrictHostKeyChecking=no" ./ ops@aurorafest.org:/var/www/aurora-backend/
+
+      - name: install dependencies on remote server
+        run: ssh -i $HOME/ecd -o StrictHostKeyChecking=no ops@aurorafest.org 'cd /var/www/aurora-backend/ && yarn install --prod pm2 restart aurora-backend'
