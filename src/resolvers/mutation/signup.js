@@ -1,4 +1,4 @@
-const { UserInputError } = require('apollo-server-express');
+const { UserInputError, ApolloError } = require('apollo-server-express');
 const bcrypt = require('bcrypt');
 
 const { generateArId } = require('../../utils/helpers');
@@ -6,6 +6,12 @@ const { generateArId } = require('../../utils/helpers');
 const signup = async (_, args, context) => {
   const { db } = context;
   const { email, password, name, college, phone } = args;
+
+  if (name === '' || email === '' || college === '' || phone === '' || password === '')
+    throw new ApolloError(
+      'Name, email, password, college or phone cannot be empty',
+      'FIELDS_REQUIRED'
+    );
 
   const user = await db.collection('users').findOne({ email });
   if (!user) {
