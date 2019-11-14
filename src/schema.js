@@ -47,7 +47,7 @@ const typeDefs = gql`
       college: String!
       phone: String!
     ): UserResponse
-    verify(email: String!, code: String!): UserResponse
+    verify(email: String!, code: String!): MutationResponse
     eventRegister(eventId: Int!): EventResponse
     sendInvite(teamId: String!, arId: String!): EventResponse
     cancelInvite(teamId: String!, arId: String!): EventResponse
