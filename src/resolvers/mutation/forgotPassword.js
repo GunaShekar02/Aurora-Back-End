@@ -8,7 +8,7 @@ const forgotPassword = async (_, args, context) => {
   const { db } = context;
   const { email } = args;
   const user = await db.collection('users').findOne({ email });
-  if (!user) {
+  if (user) {
     const token = await jwt.sign({ email }, jwtSecret.privKey, {
       algorithm: 'ES512',
       expiresIn: '1d',
@@ -22,8 +22,9 @@ const forgotPassword = async (_, args, context) => {
       subject: 'Verify email',
     };
     await mailer(mailOptions);
+    return 'Reset password email sent';
   }
-  throw new UserInputError('Invalid Email Error');
+  throw new UserInputError('Invalid Email');
 };
 
 module.exports = forgotPassword;
