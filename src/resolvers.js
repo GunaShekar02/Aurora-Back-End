@@ -10,6 +10,8 @@ const declineInvite = require('./resolvers/mutation/declineInvite');
 const removeMember = require('./resolvers/mutation/removeMember');
 const leaveTeam = require('./resolvers/mutation/leaveTeam');
 const contactUs = require('./resolvers/mutation/contactUs');
+const resetPassword = require('./resolvers/mutation/resetPassword');
+const resetForgotPassword = require('./resolvers/mutation/resetForgotPassword');
 
 const User = require('./resolvers/custom/User');
 const Team = require('./resolvers/custom/Team');
@@ -30,6 +32,8 @@ const resolvers = {
     removeMember,
     leaveTeam,
     contactUs,
+    resetPassword,
+    resetForgotPassword,
   },
   User,
   Team,

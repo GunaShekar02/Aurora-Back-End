@@ -48,6 +48,8 @@ const typeDefs = gql`
       phone: String!
     ): UserResponse
     verify(email: String!, code: String!): MutationResponse
+    resetPassword(currentPassword: String!, password: String!): UserResponse
+    resetForgotPassword(token: String!, password: String!): String!
     eventRegister(eventId: Int!): EventResponse
     sendInvite(teamId: String!, arId: String!): EventResponse
     cancelInvite(teamId: String!, arId: String!): EventResponse
