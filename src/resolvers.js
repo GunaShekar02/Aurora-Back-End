@@ -12,6 +12,7 @@ const leaveTeam = require('./resolvers/mutation/leaveTeam');
 const contactUs = require('./resolvers/mutation/contactUs');
 const verifyRegister = require('./resolvers/mutation/verifyRegister');
 const forgotPassword = require('./resolvers/mutation/forgotPassword');
+const verifyForgotPwd = require('./resolvers/mutation/verifyForgotPwd');
 
 const User = require('./resolvers/custom/User');
 const Team = require('./resolvers/custom/Team');
@@ -34,6 +35,7 @@ const resolvers = {
     contactUs,
     verifyRegister,
     forgotPassword,
+    verifyForgotPwd,
   },
   User,
   Team,

@@ -48,6 +48,7 @@ const typeDefs = gql`
       phone: String!
     ): UserResponse
     verifyRegister(token: String!): String
+    verifyForgotPwd(token: String!): String
     forgotPassword(email: String!): String
     eventRegister(eventId: Int!): EventResponse
     sendInvite(teamId: String!, arId: String!): EventResponse
