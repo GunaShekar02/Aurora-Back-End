@@ -1,10 +1,14 @@
 const { UserInputError, ApolloError } = require('apollo-server-express');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const { generateArId } = require('../../utils/helpers');
 
+const { jwtSecret } = require('../../utils/config');
+const mailer = require('../../utils/mailer');
+
 const signup = async (_, args, context) => {
-  const { db } = context;
+  const { db, client, logger } = context;
   const { email, password, name, college, phone } = args;
 
   if (name === '' || email === '' || college === '' || phone === '' || password === '')
@@ -27,18 +31,49 @@ const signup = async (_, args, context) => {
       teams: [],
       teamInvitations: [],
     };
-
+    const token = await jwt.sign({ email }, jwtSecret.privKey, {
+      algorithm: 'ES512',
+      expiresIn: '1d',
+    });
+    console.log(token);
     const hash = await bcrypt.hash(password, 10);
 
-    await db.collection('users').insertOne({
-      hash,
-      ...payload,
+    const mailOptions = {
+      to: email,
+      text: token,
+      from: 'mallik813@gmail.com',
+      html: `<html><body>Hello</body></html>`,
+      subject: 'Verify email',
+    };
+    const session = client.startSession({
+      defaultTransactionOptions: {
+        readConcern: { level: 'local' },
+        writeConcern: { w: 'majority' },
+        readPreference: 'primary',
+      },
     });
 
+    try {
+      await session.withTransaction(async () => {
+        const usersCollection = db.collection('users');
+
+        await usersCollection.insertOne({
+          hash,
+          ...payload,
+        });
+
+        await mailer(mailOptions);
+      });
+    } catch (err) {
+      logger('[TRX_ERR]', err);
+      throw new ApolloError('Something went wrong', 'TRX_FAILED');
+    } finally {
+      await session.endSession();
+    }
     return {
       code: 200,
       success: true,
-      message: 'User registered successfully',
+      message: 'User registered successfully, verify email to continue...',
       user: {
         id: arId,
         ...payload,
