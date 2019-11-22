@@ -40,9 +40,9 @@ const signup = async (_, args, context) => {
 
     const mailOptions = {
       to: email,
-      text: token,
+      // text: token,
       from: 'mallik813@gmail.com',
-      html: `<html><body>Hello</body></html>`,
+      html: `<html><body>Hello<a href=http://localhost:3000/verify/${token}>Click here</a></body></html>`,
       subject: 'Verify email',
     };
     const session = client.startSession({
