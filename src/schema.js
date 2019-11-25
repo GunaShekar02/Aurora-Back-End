@@ -17,6 +17,8 @@ const typeDefs = gql`
     email: String!
     name: String!
     college: String!
+    gender: String!
+    city: String!
     phone: String!
     isVerified: Boolean!
     accommodation: Boolean!
@@ -45,6 +47,8 @@ const typeDefs = gql`
       password: String!
       name: String!
       college: String!
+      gender: String!
+      city: String!
       phone: String!
     ): UserResponse
     verify(email: String!, code: String!): MutationResponse
