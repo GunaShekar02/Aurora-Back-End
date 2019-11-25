@@ -8,7 +8,7 @@ const login = async (_, args, context) => {
   const { db } = context;
   const { email, password } = args;
 
-  const user = await db.collection('users').findOne({ email });
+  const user = await db.collection('users').findOne({ $or: [{ email }, { _id: email }] });
   if (user) {
     const match = await bcrypt.compare(password, user.hash);
     if (match) {
