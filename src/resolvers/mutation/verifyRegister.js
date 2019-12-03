@@ -18,11 +18,7 @@ const verifyRegister = async (_, args, context) => {
   return {
     code: 200,
     success: true,
-    message: 'Verified',
-    user: {
-      id: user._id,
-      ...user,
-    },
+    message: 'Your email-id has been successfully verified, Login to continue...',
   };
 };
 module.exports = verifyRegister;
