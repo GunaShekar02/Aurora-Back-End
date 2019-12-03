@@ -73,7 +73,7 @@ const signup = async (_, args, context) => {
     return {
       code: 200,
       success: true,
-      message: 'User registered successfully, verify email to continue...',
+      message: `A mail has been sent to ${email}, verify email to continue...`,
       user: {
         id: arId,
         ...payload,
