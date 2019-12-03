@@ -21,7 +21,7 @@ const forgotPassword = async (_, args, context) => {
       subject: 'Verify email',
     };
     await mailer(mailOptions);
-    return 'Reset password email sent';
+    return `A Reset password Link has been sent to ${email}`;
   }
   throw new UserInputError('Invalid Email');
 };
