@@ -15,6 +15,14 @@ const verifyRegister = async (_, args, context) => {
   const user = await db.collection('users').findOne({ email });
   if (user.isVerified) throw new ApolloError('Already Verified', 'ALREADY_VERIFIED');
   await db.collection('users').updateOne({ email }, { $set: { isVerified: true } });
-  return 'Verified';
+  return {
+    code: 200,
+    success: true,
+    message: 'Verified',
+    user: {
+      id: user._id,
+      ...user,
+    },
+  };
 };
 module.exports = verifyRegister;
