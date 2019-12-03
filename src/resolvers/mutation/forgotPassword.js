@@ -1,6 +1,6 @@
 const { UserInputError } = require('apollo-server-express');
 const jwt = require('jsonwebtoken');
-const { jwtSecret } = require('../../utils/config');
+const { jwtHsSecret } = require('../../utils/config');
 
 const mailer = require('../../utils/mailer');
 
@@ -9,8 +9,7 @@ const forgotPassword = async (_, args, context) => {
   const { email } = args;
   const user = await db.collection('users').findOne({ email });
   if (user) {
-    const token = await jwt.sign({ email }, jwtSecret.privKey, {
-      algorithm: 'ES512',
+    const token = await jwt.sign({ email, sub: 'ForgotPassword' }, jwtHsSecret, {
       expiresIn: '1d',
     });
     console.log(token);
@@ -18,7 +17,7 @@ const forgotPassword = async (_, args, context) => {
       to: email,
       text: token,
       from: 'mallik813@gmail.com',
-      html: `<html><body>Hello</body></html>`,
+      html: `<html><body>Hello, click here to reset your password <a href=${token}>Reset password</a></body></html>`,
       subject: 'Verify email',
     };
     await mailer(mailOptions);
