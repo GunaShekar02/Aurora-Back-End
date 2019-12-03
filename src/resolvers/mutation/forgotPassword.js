@@ -9,7 +9,7 @@ const forgotPassword = async (_, args, context) => {
   const { email } = args;
   const user = await db.collection('users').findOne({ email });
   if (user) {
-    const token = await jwt.sign({ email, sub: 'ForgotPassword' }, jwtHsSecret, {
+    const token = await jwt.sign({ email, sub: 'ForgottPassword' }, jwtHsSecret, {
       expiresIn: '1d',
     });
     console.log(token);
