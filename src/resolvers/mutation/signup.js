@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 
 const { generateArId } = require('../../utils/helpers');
 
-const { jwtSecret } = require('../../utils/config');
+const { jwtHsSecret } = require('../../utils/config');
 const mailer = require('../../utils/mailer');
 
 const signup = async (_, args, context) => {
@@ -31,8 +31,7 @@ const signup = async (_, args, context) => {
       teams: [],
       teamInvitations: [],
     };
-    const token = await jwt.sign({ email }, jwtSecret.privKey, {
-      algorithm: 'ES512',
+    const token = await jwt.sign({ email, sub: 'ConfirmEmail' }, jwtHsSecret, {
       expiresIn: '1d',
     });
     console.log(token);
@@ -61,8 +60,6 @@ const signup = async (_, args, context) => {
           hash,
           ...payload,
         });
-
-        await mailer(mailOptions);
       });
     } catch (err) {
       logger('[TRX_ERR]', err);
@@ -70,6 +67,9 @@ const signup = async (_, args, context) => {
     } finally {
       await session.endSession();
     }
+
+    await mailer(mailOptions);
+
     return {
       code: 200,
       success: true,
