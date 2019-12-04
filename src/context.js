@@ -7,7 +7,7 @@ const { batchUsers } = require('./resolvers/custom/loaders/userLoader');
 const { batchTeams } = require('./resolvers/custom/loaders/teamLoader');
 const { batchEvents } = require('./resolvers/custom/loaders/eventLoader');
 
-const provideContext = (request, database, client) => {
+const provideContext = async (request, database, client) => {
   const userLoader = new DataLoader(ids => batchUsers(ids, database, logger));
   const teamLoader = new DataLoader(teamIds => batchTeams(teamIds, database, logger));
   const eventLoader = new DataLoader(eventIds => batchEvents(eventIds, database, logger));
@@ -32,16 +32,17 @@ const provideContext = (request, database, client) => {
   if (authHeader) {
     const token = authHeader.replace('bearer ', '');
 
-    jwt.verify(token, jwtSecret.pubKey, { algorithm: 'ES512' }, (err, decoded) => {
-      if (!err) {
-        payload.isValid = true;
-        payload.token = token;
-        payload.email = decoded.email;
-        payload.id = decoded.id;
+    try {
+      const decoded = await jwt.verify(token, jwtSecret.pubKey, { algorithm: 'ES512' });
+      payload.isValid = true;
+      payload.token = token;
+      payload.email = decoded.email;
+      payload.id = decoded.id;
 
-        logger('userId=>', decoded.id, 'email=>', decoded.email, '\n');
-      }
-    });
+      logger('userId=>', decoded.id, 'email=>', decoded.email, '\n');
+    } catch (err) {
+      payload.isValid = false;
+    }
   }
 
   return payload;

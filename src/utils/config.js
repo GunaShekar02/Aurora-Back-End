@@ -14,6 +14,7 @@ const {
   SMTP_HOST,
   SMTP_USER,
   SMTP_PASS,
+  JWT_TOKEN,
 } = process.env;
 
 const config = {
@@ -36,6 +37,7 @@ const config = {
       pass: SMTP_PASS,
     },
   },
+  jwtHsSecret: JWT_TOKEN,
 };
 
 module.exports = config;

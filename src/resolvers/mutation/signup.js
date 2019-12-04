@@ -1,10 +1,14 @@
 const { UserInputError, ApolloError } = require('apollo-server-express');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const { generateArId } = require('../../utils/helpers');
 
+const { jwtHsSecret } = require('../../utils/config');
+const mailer = require('../../utils/mailer');
+
 const signup = async (_, args, context) => {
-  const { db } = context;
+  const { db, client, logger } = context;
   const { email, password, name, college, phone, gender, city } = args;
   if (
     name === '' ||
@@ -16,7 +20,7 @@ const signup = async (_, args, context) => {
     city === ''
   )
     throw new ApolloError(
-      'Name, email, password, college, city, gender or phone cannot be empty',
+      'Required fields cannot be empty',
       'FIELDS_REQUIRED'
     );
 
@@ -36,18 +40,49 @@ const signup = async (_, args, context) => {
       teams: [],
       teamInvitations: [],
     };
-
+    const token = await jwt.sign({ email, sub: 'ConfirmEmail' }, jwtHsSecret, {
+      expiresIn: '360d',
+    });
+    console.log(token);
     const hash = await bcrypt.hash(password, 10);
 
-    await db.collection('users').insertOne({
-      hash,
-      ...payload,
+    const mailOptions = {
+      to: email,
+      text: token,
+      from: 'admin@aurorafest.com',
+      html: `<html><body>Hello</body></html>`,
+      subject: 'Verify email',
+    };
+    const session = client.startSession({
+      defaultTransactionOptions: {
+        readConcern: { level: 'local' },
+        writeConcern: { w: 'majority' },
+        readPreference: 'primary',
+      },
     });
+
+    try {
+      await session.withTransaction(async () => {
+        const usersCollection = db.collection('users');
+
+        await usersCollection.insertOne({
+          hash,
+          ...payload,
+        });
+      });
+    } catch (err) {
+      logger('[TRX_ERR]', err);
+      throw new ApolloError('Something went wrong', 'TRX_FAILED');
+    } finally {
+      await session.endSession();
+    }
+
+    await mailer(mailOptions);
 
     return {
       code: 200,
       success: true,
-      message: 'User registered successfully',
+      message: `A verification email has been sent to ${email}, verify your email to continue. Didn't get the verification email? Please check your spam folder.`,
       user: {
         id: arId,
         ...payload,
