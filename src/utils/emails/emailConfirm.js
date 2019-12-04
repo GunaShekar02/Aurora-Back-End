@@ -83,9 +83,13 @@ https://aurorafest.org/verify/${verificationHash}
 
 ABV-IIITM, Gwalior, Madhya Pradesh, 474015
 `;
+
   return {
     html,
     text,
+    to: email,
+    from: 'Aurora <admin@aurorafest.com>',
+    subject: 'Verify your email to complete the registration',
   };
 };
 

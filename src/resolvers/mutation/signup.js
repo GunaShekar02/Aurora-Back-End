@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const { generateArId } = require('../../utils/helpers');
+const getConfirmEmail = require('../../utils/emails/emailConfirm');
 
 const { jwtHsSecret } = require('../../utils/config');
 const mailer = require('../../utils/mailer');
@@ -19,10 +20,7 @@ const signup = async (_, args, context) => {
     gender === '' ||
     city === ''
   )
-    throw new ApolloError(
-      'Required fields cannot be empty',
-      'FIELDS_REQUIRED'
-    );
+    throw new ApolloError('Required fields cannot be empty', 'FIELDS_REQUIRED');
 
   const user = await db.collection('users').findOne({ email });
   if (!user) {
@@ -35,10 +33,12 @@ const signup = async (_, args, context) => {
       phone,
       gender,
       city,
+      displayPic: `profile-${gender}.jpg`,
       isVerified: false,
       accommodation: false,
       teams: [],
       teamInvitations: [],
+      timeSt: `${Date.now()}`,
     };
     const token = await jwt.sign({ email, sub: 'ConfirmEmail' }, jwtHsSecret, {
       expiresIn: '360d',
@@ -46,13 +46,7 @@ const signup = async (_, args, context) => {
     console.log(token);
     const hash = await bcrypt.hash(password, 10);
 
-    const mailOptions = {
-      to: email,
-      text: token,
-      from: 'admin@aurorafest.com',
-      html: `<html><body>Hello</body></html>`,
-      subject: 'Verify email',
-    };
+    const mailOptions = getConfirmEmail(name, email, token);
     const session = client.startSession({
       defaultTransactionOptions: {
         readConcern: { level: 'local' },
