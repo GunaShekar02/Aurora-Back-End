@@ -32,7 +32,7 @@ const signup = async (_, args, context) => {
       teamInvitations: [],
     };
     const token = await jwt.sign({ email, sub: 'ConfirmEmail' }, jwtHsSecret, {
-      expiresIn: '1d',
+      expiresIn: '360d',
     });
     console.log(token);
     const hash = await bcrypt.hash(password, 10);
@@ -40,7 +40,7 @@ const signup = async (_, args, context) => {
     const mailOptions = {
       to: email,
       text: token,
-      from: 'mallik813@gmail.com',
+      from: 'admin@aurorafest.com',
       html: `<html><body>Hello</body></html>`,
       subject: 'Verify email',
     };
@@ -73,7 +73,7 @@ const signup = async (_, args, context) => {
     return {
       code: 200,
       success: true,
-      message: `A mail has been sent to ${email}, verify email to continue...`,
+      message: `A verification email has been sent to ${email}, verify your email to continue. Didn't get the verification email? Please check your spam folder.`,
       user: {
         id: arId,
         ...payload,

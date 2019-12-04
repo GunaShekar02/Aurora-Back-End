@@ -7,11 +7,12 @@ const verifyRegister = async (_, args, context) => {
   const { db } = context;
   const { token } = args;
   let email;
-
-  jwt.verify(token, jwtHsSecret, (err, decoded) => {
-    if (!err && decoded.sub === 'ConfirmEmail') email = decoded.email;
-    else throw new ApolloError('there was an error', err);
-  });
+  try {
+    const decoded = await jwt.verify(token, jwtHsSecret, { subject: 'ConfirmEmail' });
+    email = decoded.email;
+  } catch (err) {
+    throw new ApolloError('Invalid token', 'JWT_ERROR');
+  }
   const user = await db.collection('users').findOne({ email });
   if (user.isVerified) throw new ApolloError('Already Verified', 'ALREADY_VERIFIED');
   await db.collection('users').updateOne({ email }, { $set: { isVerified: true } });
