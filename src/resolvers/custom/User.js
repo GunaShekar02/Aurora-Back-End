@@ -14,6 +14,16 @@ const User = {
     const user = await userLoader.load(id);
     return user.college;
   },
+  city: async (args, __, { userLoader }) => {
+    const { id } = args;
+    const user = await userLoader.load(id);
+    return user.city;
+  },
+  gender: async (args, __, { userLoader }) => {
+    const { id } = args;
+    const user = await userLoader.load(id);
+    return user.gender;
+  },
   isVerified: async (args, __, { userLoader }) => {
     const { id } = args;
     const user = await userLoader.load(id);

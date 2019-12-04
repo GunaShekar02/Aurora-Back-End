@@ -9,11 +9,18 @@ const mailer = require('../../utils/mailer');
 
 const signup = async (_, args, context) => {
   const { db, client, logger } = context;
-  const { email, password, name, college, phone } = args;
-
-  if (name === '' || email === '' || college === '' || phone === '' || password === '')
+  const { email, password, name, college, phone, gender, city } = args;
+  if (
+    name === '' ||
+    email === '' ||
+    college === '' ||
+    phone === '' ||
+    password === '' ||
+    gender === '' ||
+    city === ''
+  )
     throw new ApolloError(
-      'Name, email, password, college or phone cannot be empty',
+      'Required fields cannot be empty',
       'FIELDS_REQUIRED'
     );
 
@@ -26,6 +33,8 @@ const signup = async (_, args, context) => {
       name,
       college,
       phone,
+      gender,
+      city,
       isVerified: false,
       accommodation: false,
       teams: [],
