@@ -20,10 +20,12 @@ const typeDefs = gql`
     gender: String!
     city: String!
     phone: String!
+    displayPic: String!
     isVerified: Boolean!
     accommodation: Boolean!
     teams: [Team!]
     teamInvitations: [TeamInvitation!]
+    timeSt: String!
   }
 
   type Team {
