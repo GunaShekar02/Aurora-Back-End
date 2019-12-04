@@ -41,4 +41,4 @@ jobs:
         run: rsync -avz --exclude 'node_modules' --exclude '.git*' --delete -e "ssh -i $HOME/ecd -o StrictHostKeyChecking=no" ./ ops@staging.aurorafest.org:/var/www/aurora-staging-backend/
 
       - name: install dependencies on remote server
-        run: ssh -i $HOME/ecd -o StrictHostKeyChecking=no ops@staging.aurorafest.org 'cd /var/www/aurora-staging-backend/ && yarn install --prod && cp /home/ops/stgenv ./env && pm2 restart aurora-staging-backend'
+        run: ssh -i $HOME/ecd -o StrictHostKeyChecking=no ops@staging.aurorafest.org 'cd /var/www/aurora-staging-backend/ && yarn install --prod && cp /home/ops/stgenv ./.env && pm2 restart aurora-staging-backend'
