@@ -1,11 +1,11 @@
 const { UserInputError, ApolloError } = require('apollo-server-express');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+// const jwt = require('jsonwebtoken');
 
 const { generateArId } = require('../../utils/helpers');
 const getConfirmEmail = require('../../utils/emails/emailConfirm');
 
-const { jwtHsSecret } = require('../../utils/config');
+// const { jwtHsSecret } = require('../../utils/config');
 const mailer = require('../../utils/mailer');
 
 const signup = async (_, args, context) => {
@@ -42,9 +42,7 @@ const signup = async (_, args, context) => {
       teamInvitations: [],
       timeSt: `${Date.now()}`,
     };
-    const token = await jwt.sign({ email, sub: 'ConfirmEmail' }, jwtHsSecret, {
-      expiresIn: '360d',
-    });
+    const token = `${arId.replace(/-/g, '')}${Math.floor(Math.random() * 899999 + 100000)}`;
     console.log(token);
     const hash = await bcrypt.hash(password, 10);
 
@@ -60,11 +58,23 @@ const signup = async (_, args, context) => {
     try {
       await session.withTransaction(async () => {
         const usersCollection = db.collection('users');
+        const verifyCollection = db.collection('verify');
 
-        await usersCollection.insertOne({
-          hash,
-          ...payload,
-        });
+        await usersCollection.insertOne(
+          {
+            hash,
+            ...payload,
+          },
+          { session }
+        );
+
+        await verifyCollection.insertOne(
+          {
+            _id: arId,
+            verifyHash: token,
+          },
+          { session }
+        );
       });
     } catch (err) {
       logger('[TRX_ERR]', err);
