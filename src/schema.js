@@ -10,6 +10,7 @@ const typeDefs = gql`
     name: String!
     maxSize: Int!
     fee: Int!
+    parentEvent: String
   }
 
   type User {
