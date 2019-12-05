@@ -3,7 +3,8 @@ const { ApolloError, AuthenticationError } = require('apollo-server-express');
 const cancelInvite = async (_, args, context) => {
   const { isValid, db, client, id, teamLoader, logger } = context;
   if (isValid) {
-    const { teamId, arId } = args;
+    const teamId = args.teamId.toUpperCase();
+    const arId = args.arId.toUpperCase();
 
     const team = await teamLoader.load(teamId);
     if (!team) throw new ApolloError('Team does not exist', 'INVALID_TEAM');
