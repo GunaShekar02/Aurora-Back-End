@@ -79,7 +79,9 @@ Hey ${name},
 
 We received a request for registration in Aurora 20 with email ${email}. To activate your account, verify your email by clicking the link below. Ignore this email if you have not registered.
 
-https://aurorafest.org/verify/${verificationHash}
+https://${(process.env.NODE_ENV = 'production'
+    ? ``
+    : `staging.`)}aurorafest.org/verify/${verificationHash}
 
 ABV-IIITM, Gwalior, Madhya Pradesh, 474015
 `;
