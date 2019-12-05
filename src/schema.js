@@ -34,7 +34,7 @@ const typeDefs = gql`
     event: Event!
     members: [User!]!
     paymentStatus: Boolean!
-    pendingInvitation: [User!]
+    pendingInvitations: [User!]
   }
 
   type TeamInvitation {
