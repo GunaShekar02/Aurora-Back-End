@@ -4,7 +4,7 @@ const declineInvite = async (_, args, context) => {
   const { isValid, db, client, id, logger, userLoader } = context;
 
   if (isValid) {
-    const { teamId } = args;
+    const teamId = args.teamId.toUpperCase();
 
     const user = await userLoader.load(id);
     const verifyInvite = user.teamInvitations.some(invite => invite.teamId === teamId);

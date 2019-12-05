@@ -10,7 +10,9 @@ const mailer = require('../../utils/mailer');
 
 const signup = async (_, args, context) => {
   const { db, client, logger } = context;
-  const { email, password, name, college, phone, gender, city } = args;
+  const { password, name, college, phone, gender, city } = args;
+  const email = args.email.toLowerCase();
+
   if (
     name === '' ||
     email === '' ||
