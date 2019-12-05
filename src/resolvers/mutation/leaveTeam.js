@@ -4,7 +4,7 @@ const leaveTeam = async (_, args, context) => {
   const { isValid, db, client, id, teamLoader, logger } = context;
 
   if (isValid) {
-    const { teamId } = args;
+    const teamId = args.teamId.toUpperCase();
 
     const team = await teamLoader.load(teamId);
     if (!team) throw new ApolloError('Invalid team', 'INVALID_TEAM');

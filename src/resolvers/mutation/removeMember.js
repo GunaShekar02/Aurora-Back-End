@@ -4,7 +4,8 @@ const removeMember = async (_, args, context) => {
   const { isValid, db, client, id, logger, teamLoader } = context;
 
   if (isValid) {
-    const { teamId, arId } = args;
+    const teamId = args.teamId.toUpperCase();
+    const arId = args.arId.toUpperCase();
 
     if (arId === id)
       throw new ApolloError('You cannot remove yourself from team.', 'CANNOT_REMOVE_YOURSELF');

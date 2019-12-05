@@ -4,7 +4,8 @@ const acceptInvite = async (_, args, context) => {
   const { isValid, db, client, id, userLoader, logger } = context;
 
   if (isValid) {
-    const { teamId } = args;
+    const teamId = args.teamId.toUpperCase();
+
     const team = await db.collection('teams').findOne({ _id: teamId, pendingInvitations: { id } });
 
     if (!team) throw new ApolloError('Invalid Team or you are not Invited', 'UNAUTHORIZED');
