@@ -10,6 +10,7 @@ const typeDefs = gql`
     name: String!
     maxSize: Int!
     fee: Int!
+    parentEvent: String
   }
 
   type User {
@@ -17,11 +18,15 @@ const typeDefs = gql`
     email: String!
     name: String!
     college: String!
+    gender: String!
+    city: String!
     phone: String!
+    displayPic: String!
     isVerified: Boolean!
     accommodation: Boolean!
     teams: [Team!]
     teamInvitations: [TeamInvitation!]
+    timeSt: String!
   }
 
   type Team {
@@ -30,7 +35,7 @@ const typeDefs = gql`
     event: Event!
     members: [User!]!
     paymentStatus: Boolean!
-    pendingInvitation: [User!]
+    pendingInvitations: [User!]
   }
 
   type TeamInvitation {
@@ -45,9 +50,11 @@ const typeDefs = gql`
       password: String!
       name: String!
       college: String!
+      gender: String!
+      city: String!
       phone: String!
     ): UserResponse
-    verify(email: String!, code: String!): MutationResponse
+    verifyRegister(token: String!): MutationResponse
     eventRegister(eventId: Int!): EventResponse
     sendInvite(teamId: String!, arId: String!): EventResponse
     cancelInvite(teamId: String!, arId: String!): EventResponse
@@ -57,6 +64,8 @@ const typeDefs = gql`
     leaveTeam(teamId: String!): UserResponse
     pay(teamId: String!): UserResponse
     contactUs(name: String!, email: String!, subject: String, message: String!): MutationResponse
+    forgotPassword(arIdOrEmail: String!): MutationResponse
+    verifyRegister(token: String!, password: String!): MutationResponse
   }
 
   type EventResponse {

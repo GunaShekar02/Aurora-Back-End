@@ -1,6 +1,9 @@
 const eventData = require('../../data/eventData');
 
 const Event = {
+  id: async ({ id }) => {
+    return id;
+  },
   name: async ({ id }) => {
     const event = eventData.get(id);
     return event.name;
@@ -12,6 +15,10 @@ const Event = {
   maxSize: async ({ id }) => {
     const event = eventData.get(id);
     return event.maxSize;
+  },
+  parentEvent: async ({ id }) => {
+    const event = eventData.get(id);
+    return event.parentEvent;
   },
 };
 

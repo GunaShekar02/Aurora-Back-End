@@ -2,16 +2,25 @@ const { UserInputError, ApolloError } = require('apollo-server-express');
 const bcrypt = require('bcrypt');
 
 const { generateArId } = require('../../utils/helpers');
+const getConfirmEmail = require('../../utils/emails/emailConfirm');
+
+const mailer = require('../../utils/mailer');
 
 const signup = async (_, args, context) => {
-  const { db } = context;
-  const { email, password, name, college, phone } = args;
+  const { db, client, logger } = context;
+  const { password, name, college, phone, gender, city } = args;
+  const email = args.email.toLowerCase();
 
-  if (name === '' || email === '' || college === '' || phone === '' || password === '')
-    throw new ApolloError(
-      'Name, email, password, college or phone cannot be empty',
-      'FIELDS_REQUIRED'
-    );
+  if (
+    name === '' ||
+    email === '' ||
+    college === '' ||
+    phone === '' ||
+    password === '' ||
+    gender === '' ||
+    city === ''
+  )
+    throw new ApolloError('Required fields cannot be empty', 'FIELDS_REQUIRED');
 
   const user = await db.collection('users').findOne({ email });
   if (!user) {
@@ -22,23 +31,62 @@ const signup = async (_, args, context) => {
       name,
       college,
       phone,
+      gender,
+      city,
+      displayPic: `profile-${gender}.jpg`,
       isVerified: false,
       accommodation: false,
       teams: [],
       teamInvitations: [],
+      timeSt: `${Date.now()}`,
     };
-
+    const token = `${arId.replace(/-/g, '')}${Math.floor(Math.random() * 899999 + 100000)}`;
+    console.log(token);
     const hash = await bcrypt.hash(password, 10);
 
-    await db.collection('users').insertOne({
-      hash,
-      ...payload,
+    const mailOptions = getConfirmEmail(name, email, token);
+    const session = client.startSession({
+      defaultTransactionOptions: {
+        readConcern: { level: 'local' },
+        writeConcern: { w: 'majority' },
+        readPreference: 'primary',
+      },
     });
+
+    try {
+      await session.withTransaction(async () => {
+        const usersCollection = db.collection('users');
+        const verifyCollection = db.collection('verify');
+
+        await usersCollection.insertOne(
+          {
+            hash,
+            ...payload,
+          },
+          { session }
+        );
+
+        await verifyCollection.insertOne(
+          {
+            _id: arId,
+            verifyHash: token,
+          },
+          { session }
+        );
+      });
+    } catch (err) {
+      logger('[TRX_ERR]', err);
+      throw new ApolloError('Something went wrong', 'TRX_FAILED');
+    } finally {
+      await session.endSession();
+    }
+
+    await mailer(mailOptions);
 
     return {
       code: 200,
       success: true,
-      message: 'User registered successfully',
+      message: `A verification email has been sent to ${email}, verify your email to continue. Didn't get the verification email? Please check your spam folder.`,
       user: {
         id: arId,
         ...payload,

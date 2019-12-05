@@ -19,6 +19,11 @@ const Team = {
     return { id: team.event };
   },
 
+  pendingInvitations: async ({ teamId }, __, { teamLoader }) => {
+    const team = await teamLoader.load(teamId);
+    return team.pendingInvitations;
+  },
+
   paymentStatus: async ({ teamId }, __, { teamLoader }) => {
     const team = await teamLoader.load(teamId);
     return team.paymentStatus;

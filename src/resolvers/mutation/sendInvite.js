@@ -5,7 +5,9 @@ const sendInvite = async (_, args, context) => {
   const { isValid, db, client, id, userLoader, logger } = context;
 
   if (isValid) {
-    const { teamId, arId } = args;
+    const teamId = args.teamId.toUpperCase();
+    const arId = args.arId.toUpperCase();
+
     const team = await db.collection('teams').findOne({ _id: teamId, members: id });
 
     if (!team)
