@@ -6,7 +6,7 @@ const data = [
       name: 'Parivesh',
       fee: 2500,
       maxSize: 15,
-      parentEvent: null,
+      parentEvent: 'parivesh',
     },
   ],
   [
@@ -16,7 +16,7 @@ const data = [
       name: 'Corna',
       fee: 2000,
       maxSize: 10,
-      parentEvent: null,
+      parentEvent: 'corna',
     },
   ],
   [
@@ -26,7 +26,7 @@ const data = [
       name: 'Mr. and Ms. Aurora',
       fee: 500,
       maxSize: 1,
-      parentEvent: null,
+      parentEvent: 'mnm',
     },
   ],
   [
@@ -226,7 +226,7 @@ const data = [
       name: 'Nukkad Natak',
       fee: 479,
       maxSize: 20,
-      parentEvent: null,
+      parentEvent: 'nukkad',
     },
   ],
   [
