@@ -1,5 +1,8 @@
 const getConfirmEmail = (name, email, verificationHash) => {
-  const html = `<html>
+  const uri = process.env.NODE_ENV === 'production' ? `` : `staging.`;
+
+  const html = `<html lang="en">
+  <meta charset="UTF-8">
   <body>
     <table class="main-body" style="box-sizing: border-box; min-height: 150px; padding-top: 5px; padding-right: 5px; padding-bottom: 5px; padding-left: 5px; width: 100%; height: 100%; border-collapse: separate; background-color: rgb(216, 216, 216);" width="100%" height="100%" bgcolor="rgb(216, 216, 216)">
       <tbody style="box-sizing: border-box;">
@@ -35,7 +38,7 @@ const getConfirmEmail = (name, email, verificationHash) => {
                                 <br data-highlightable="1" style="box-sizing: border-box;">
                               </div>
                             </div>
-                            <a target="_blank" title="confirm email" href="https://aurorafest.org/verify/${verificationHash}" class="button" style="box-sizing: border-box; font-size: 22px; color: rgb(255, 255, 255); text-align: center; font-weight: 300; text-decoration-line: none; text-decoration-style: solid; text-decoration-color: currentcolor; text-decoration-thickness: auto; background-color: rgb(49, 67, 78); margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 10px; padding-top: 14px; padding-right: 25px; padding-bottom: 14px; padding-left: 25px; border-top-left-radius: 0px; border-top-right-radius: 0px; border-bottom-right-radius: 0px; border-bottom-left-radius: 0px;">Confirm Email</a>
+                            <a target="_blank" title="confirm email" href="https://${uri}aurorafest.org/verify/${verificationHash}" class="button" style="box-sizing: border-box; font-size: 22px; color: rgb(255, 255, 255); text-align: center; font-weight: 300; text-decoration-line: none; text-decoration-style: solid; text-decoration-color: currentcolor; text-decoration-thickness: auto; background-color: rgb(49, 67, 78); margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 10px; padding-top: 14px; padding-right: 25px; padding-bottom: 14px; padding-left: 25px; border-top-left-radius: 0px; border-top-right-radius: 0px; border-bottom-right-radius: 0px; border-bottom-left-radius: 0px;">Confirm Email</a>
                           </td>
                         </tr>
                       </tbody>
@@ -79,9 +82,7 @@ Hey ${name},
 
 We received a request for registration in Aurora 20 with email ${email}. To activate your account, verify your email by clicking the link below. Ignore this email if you have not registered.
 
-https://${(process.env.NODE_ENV = 'production'
-    ? ``
-    : `staging.`)}aurorafest.org/verify/${verificationHash}
+https://${uri}aurorafest.org/verify/${verificationHash}
 
 ABV-IIITM, Gwalior, Madhya Pradesh, 474015
 `;
@@ -90,7 +91,7 @@ ABV-IIITM, Gwalior, Madhya Pradesh, 474015
     html,
     text,
     to: email,
-    from: 'Aurora <admin@aurorafest.com>',
+    from: 'Aurora <admin@aurorafest.org>',
     subject: 'Verify your email to complete the registration',
   };
 };
