@@ -1,11 +1,9 @@
 const { UserInputError, ApolloError } = require('apollo-server-express');
 const bcrypt = require('bcrypt');
-// const jwt = require('jsonwebtoken');
 
 const { generateArId } = require('../../utils/helpers');
 const getConfirmEmail = require('../../utils/emails/emailConfirm');
 
-// const { jwtHsSecret } = require('../../utils/config');
 const mailer = require('../../utils/mailer');
 
 const signup = async (_, args, context) => {

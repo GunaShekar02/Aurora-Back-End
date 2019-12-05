@@ -64,6 +64,8 @@ const typeDefs = gql`
     leaveTeam(teamId: String!): UserResponse
     pay(teamId: String!): UserResponse
     contactUs(name: String!, email: String!, subject: String, message: String!): MutationResponse
+    forgotPassword(arIdOrEmail: String!): MutationResponse
+    verifyRegister(token: String!, password: String!): MutationResponse
   }
 
   type EventResponse {
