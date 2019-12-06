@@ -15,6 +15,7 @@ const forgotPassword = require('./resolvers/mutation/forgotPassword');
 const resetPassword = require('./resolvers/mutation/resetPassword');
 
 const User = require('./resolvers/custom/User');
+const PublicUser = require('./resolvers/custom/PublicUser');
 const Team = require('./resolvers/custom/Team');
 const Event = require('./resolvers/custom/Event');
 
@@ -38,6 +39,7 @@ const resolvers = {
     resetPassword,
   },
   User,
+  PublicUser,
   Team,
   Event,
 };

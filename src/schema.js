@@ -29,18 +29,24 @@ const typeDefs = gql`
     timeSt: String!
   }
 
+  type PublicUser {
+    id: String!
+    name: String!
+    displayPic: String!
+  }
+
   type Team {
     id: String!
     name: String
     event: Event!
-    members: [User!]!
+    members: [PublicUser!]!
     paymentStatus: Boolean!
-    pendingInvitations: [User!]
+    pendingInvitations: [PublicUser!]
   }
 
   type TeamInvitation {
     team: Team!
-    invitedBy: User!
+    invitedBy: PublicUser!
   }
 
   type Mutation {
@@ -59,7 +65,7 @@ const typeDefs = gql`
     sendInvite(teamId: String!, arId: String!): EventResponse
     cancelInvite(teamId: String!, arId: String!): EventResponse
     acceptInvite(teamId: String!): EventResponse
-    declineInvite(teamId: String!): UserResponse
+    declineInvite(teamId: String!): EventResponse
     removeMember(teamId: String!, arId: String!): EventResponse
     leaveTeam(teamId: String!): UserResponse
     pay(teamId: String!): UserResponse
