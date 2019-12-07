@@ -9,6 +9,7 @@ const typeDefs = gql`
     id: Int!
     name: String!
     maxSize: Int!
+    isNameRequired: Boolean!
     fee: Int!
     parentEvent: String
   }
@@ -66,6 +67,7 @@ const typeDefs = gql`
     contactUs(name: String!, email: String!, subject: String, message: String!): MutationResponse
     forgotPassword(arIdOrEmail: String!): MutationResponse
     resetPassword(token: String!, password: String!): MutationResponse
+    setTeamName(teamId: String!, name: String!): EventResponse
   }
 
   type EventResponse {

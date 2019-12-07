@@ -12,6 +12,10 @@ const Event = {
     const event = eventData.get(id);
     return event.fee;
   },
+  isNameRequired: async ({ id }) => {
+    const event = eventData.get(id);
+    return event.isNameRequired;
+  },
   maxSize: async ({ id }) => {
     const event = eventData.get(id);
     return event.maxSize;

@@ -1,10 +1,11 @@
 const { ApolloError, AuthenticationError } = require('apollo-server-express');
 
-const leaveTeam = async (_, args, context) => {
+const setTeamName = async (_, args, context) => {
   const { isValid, db, client, id, teamLoader, logger } = context;
 
   if (isValid) {
     const teamId = args.teamId.toUpperCase();
+    const { name } = args;
 
     const team = await teamLoader.load(teamId);
     if (!team) throw new ApolloError('Invalid team', 'INVALID_TEAM');
@@ -14,9 +15,7 @@ const leaveTeam = async (_, args, context) => {
     if (!verifyMember) throw new ApolloError('You are not a member of this team', 'NOT_A_MEMBER');
 
     if (team.paymentStatus)
-      throw new ApolloError('Cannot leave team after payment', 'PAID_CANNOT_LEAVE');
-
-    const invites = team.pendingInvitations.map(invite => invite.id);
+      throw new ApolloError('Cannot change team name after payment', 'PAID_CANNOT_CHANGE');
 
     const session = client.startSession({
       defaultTransactionOptions: {
@@ -28,34 +27,11 @@ const leaveTeam = async (_, args, context) => {
 
     try {
       await session.withTransaction(async () => {
-        const usersCollection = db.collection('users');
         const teamsCollection = db.collection('teams');
 
-        const userRes = usersCollection.updateOne(
-          { _id: id },
-          { $pull: { teams: { teamId } } },
-          { session }
-        );
+        const userRes = teamsCollection.updateOne({ _id: teamId }, { $set: { name } }, { session });
 
-        if (team.members.length === 1) {
-          const inviteRes = usersCollection.updateMany(
-            { _id: { $in: invites } },
-            { $pull: { teamInvitations: { teamId } } },
-            { session }
-          );
-
-          const teamRes = teamsCollection.deleteOne({ _id: teamId }, { session });
-
-          return Promise.all([userRes, teamRes, inviteRes]);
-        }
-
-        const teamRes = teamsCollection.updateOne(
-          { _id: teamId },
-          { $pull: { members: id } },
-          { session }
-        );
-
-        return Promise.all([userRes, teamRes]);
+        return userRes;
       });
     } catch (err) {
       logger('[TRX_ERR]', err);
@@ -68,10 +44,11 @@ const leaveTeam = async (_, args, context) => {
     return {
       code: 200,
       success: true,
-      message: 'Left from team',
+      message: 'Team name changed successfully',
+      team: { teamId },
     };
   }
   throw new AuthenticationError('User is not logged in');
 };
 
-module.exports = leaveTeam;
+module.exports = setTeamName;
