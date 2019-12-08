@@ -21,6 +21,9 @@ const removeMember = async (_, args, context) => {
     if (!verifyReceiver)
       throw new ApolloError('User is not a member of this team', 'USR_NOT_A_MEMBER');
 
+    if (team.paymentStatus)
+      throw new ApolloError('Cannot remove user after payment', 'PAID_CANNOT_REMOVE');
+
     const session = client.startSession({
       defaultTransactionOptions: {
         readConcern: { level: 'local' },

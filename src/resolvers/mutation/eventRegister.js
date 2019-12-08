@@ -46,7 +46,7 @@ const eventRegister = async (_, args, context) => {
           const teamRes = teamsCollection.insertOne(
             {
               _id: teamId,
-              name: 'currently not req',
+              name: null,
               event: eventId,
               members: [userId],
               paymentStatus: false,
