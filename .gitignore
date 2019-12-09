@@ -1,5 +1,7 @@
 node_modules
 .env
+envprod
+envstg
 keys/
 .vscode
 npm-debug.log*

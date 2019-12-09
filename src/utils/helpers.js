@@ -3,19 +3,13 @@ const generateRandomNumber = () => {
 };
 
 const findUser = async (arId, db) => {
-  const user = await db
-    .collection('users')
-    .find({ _id: arId })
-    .toArray();
-  return user.length;
+  const user = await db.collection('users').findOne({ _id: arId });
+  return user;
 };
 
 const findTeam = async (teamId, db) => {
-  const team = await db
-    .collection('teams')
-    .find({ _id: teamId })
-    .toArray();
-  return team.length;
+  const team = await db.collection('teams').findOne({ _id: teamId });
+  return team;
 };
 
 const generateArId = async (name, db) => {
@@ -47,4 +41,13 @@ const generateTeamId = async (arId, eventId, db) => {
   return newTeamId;
 };
 
-module.exports = { generateArId, generateTeamId };
+const generateReceipt = async (arId, db) => {
+  const randomNumber = Math.floor(Math.random() * 899999 + 100000);
+  const receipt = `${arId}-${randomNumber}`;
+  const verifyReceipt = await db.collection('orders').findOne({ receipt });
+  if (!verifyReceipt) return receipt;
+  const newReceipt = await generateReceipt(arId, db);
+  return newReceipt;
+};
+
+module.exports = { generateArId, generateTeamId, generateReceipt };
