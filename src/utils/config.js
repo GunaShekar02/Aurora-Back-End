@@ -42,7 +42,7 @@ const config = {
     key_id: RZP_KEY_ID,
     key_secret: RZP_KEY_SECRET,
   },
-  extraCharges: 2.41,
+  extraCharges: 2.42,
 };
 
 module.exports = config;

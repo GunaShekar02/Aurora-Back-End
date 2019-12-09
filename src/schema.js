@@ -69,6 +69,7 @@ const typeDefs = gql`
     resetPassword(token: String!, password: String!): MutationResponse
     setTeamName(teamId: String!, name: String!): EventResponse
     generateEventOrder(teamIds: [String!]!): OrderResponse
+    verifyEventOrder(orderId: String!, paymentId: String!, signature: String!): UserResponse
   }
 
   type EventResponse {
