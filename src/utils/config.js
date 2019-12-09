@@ -14,6 +14,8 @@ const {
   SMTP_HOST,
   SMTP_USER,
   SMTP_PASS,
+  RZP_KEY_ID,
+  RZP_KEY_SECRET,
 } = process.env;
 
 const config = {
@@ -36,6 +38,11 @@ const config = {
       pass: SMTP_PASS,
     },
   },
+  rzpOptions: {
+    key_id: RZP_KEY_ID,
+    key_secret: RZP_KEY_SECRET,
+  },
+  extraCharges: 2.41,
 };
 
 module.exports = config;

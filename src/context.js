@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const DataLoader = require('dataloader');
 const { jwtSecret } = require('./utils/config');
 const logger = require('./utils/logger');
+const rzp = require('./razorpay');
 
 const { batchUsers } = require('./resolvers/custom/loaders/userLoader');
 const { batchTeams } = require('./resolvers/custom/loaders/teamLoader');
@@ -24,6 +25,7 @@ const provideContext = async (request, database, client) => {
     teamLoader,
     eventLoader,
     logger,
+    rzp,
   };
   const authHeader = req.headers.authorization || null;
 
