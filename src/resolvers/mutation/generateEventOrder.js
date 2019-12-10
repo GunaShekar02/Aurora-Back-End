@@ -10,11 +10,11 @@ const generateEventOrder = async (_, args, context) => {
   if (isValid) {
     const teams = await teamLoader.loadMany(teamIds);
 
-    logger(teams);
-
     if (teams.some(team => team === null)) throw new ApolloError('Invalid Team ID', 'INVALID_TEAM');
+
     if (teams.some(team => !team.members.some(member => member === id)))
       throw new ApolloError('User is not a member of any one of listed teams', 'USR_NOT_MEMBER');
+
     if (teams.some(team => team.paymentStatus === true))
       throw new ApolloError('Payment already done for some of listed teams', 'TEAM_ALREADY_PAID');
 
@@ -32,22 +32,25 @@ const generateEventOrder = async (_, args, context) => {
         receipt,
       });
 
-      logger(orderData);
-
       logger('[ORDER]', 'order created by', id, 'for', teamIds, 'orderId:', orderData.id);
 
-      await db.collection('orders').insertOne({
-        orderId: orderData.id,
-        paymentId: null,
-        signature: null,
-        receipt,
-        paidBy: id,
-        teams: teamIds,
-        amount: totalAmount,
-        finalAmount,
-        status: 'initiated',
-        timeSt: orderData.created_at,
-      });
+      try {
+        await db.collection('orders').insertOne({
+          orderId: orderData.id,
+          paymentId: null,
+          signature: null,
+          receipt,
+          paidBy: id,
+          teams: teamIds,
+          amount: totalAmount,
+          finalAmount,
+          status: 'initiated',
+          timeSt: orderData.created_at,
+        });
+      } catch (err) {
+        logger('[ERR] [ORDER]', err);
+        throw new ApolloError('Some error occured', '[DB_ERR]');
+      }
 
       return {
         order_id: orderData.id,
@@ -55,6 +58,19 @@ const generateEventOrder = async (_, args, context) => {
         key: rzpOptions.key_id,
       };
     }
+    try {
+      logger('[ORDER]', 'Order with value 0; teamIds=>', teamIds);
+
+      const teamsCollection = db.collection('teams');
+      await teamsCollection.updateMany(
+        { _id: { $in: teamIds } },
+        { $set: { paymentStatus: true } }
+      );
+    } catch (err) {
+      logger('[ERR] [ORDER]', err);
+      throw new ApolloError('Some error occured', '[DB_ERR]');
+    }
+
     return {
       order_id: '0',
       amount: '0',
