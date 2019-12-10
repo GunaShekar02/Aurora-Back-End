@@ -320,4 +320,6 @@ const data = [
   ],
 ];
 
-module.exports = new Map(data);
+const eventMap = new Map(data);
+
+module.exports = eventMap;
