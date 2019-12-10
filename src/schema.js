@@ -68,10 +68,12 @@ const typeDefs = gql`
     forgotPassword(arIdOrEmail: String!): MutationResponse
     resetPassword(token: String!, password: String!): MutationResponse
     setTeamName(teamId: String!, name: String!): EventResponse
+    generateEventOrder(teamIds: [String!]!): OrderResponse
+    verifyEventOrder(orderId: String!, paymentId: String!, signature: String!): UserResponse
   }
 
   type EventResponse {
-    code: String
+    code: String!
     success: Boolean!
     message: String
     team: Team!
@@ -88,6 +90,12 @@ const typeDefs = gql`
     success: Boolean!
     message: String
     user: User!
+  }
+
+  type OrderResponse {
+    order_id: String!
+    key: String!
+    amount: String!
   }
 `;
 

@@ -70,7 +70,7 @@ const data = [
     {
       id: 7,
       name: 'Raag',
-      fee: 200,
+      fee: 249,
       isNameRequired: false,
       maxSize: 4,
       parentEvent: 'eumelia',
@@ -301,7 +301,7 @@ const data = [
     {
       id: 28,
       name: 'CS-GO',
-      fee: 249,
+      fee: 349,
       isNameRequired: true,
       maxSize: 5,
       parentEvent: 'gaming',
@@ -312,7 +312,7 @@ const data = [
     {
       id: 29,
       name: 'PUBG',
-      fee: 149,
+      fee: 199,
       isNameRequired: true,
       maxSize: 4,
       parentEvent: 'gaming',
