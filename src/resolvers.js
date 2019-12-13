@@ -1,4 +1,5 @@
 const user = require('./resolvers/query/user');
+const allUsers = require('./resolvers/query/protected/allUsers');
 
 const signup = require('./resolvers/mutation/signup');
 const login = require('./resolvers/mutation/login');
@@ -24,6 +25,7 @@ const Event = require('./resolvers/custom/Event');
 const resolvers = {
   Query: {
     user,
+    allUsers,
   },
   Mutation: {
     signup,

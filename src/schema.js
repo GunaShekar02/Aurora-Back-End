@@ -3,6 +3,12 @@ const { gql } = require('apollo-server-express');
 const typeDefs = gql`
   type Query {
     user: User!
+    allUsers(limit: Int, page: Int, sortBy: String, sortDir: Int): UserQueryRes
+  }
+
+  type UserQueryRes {
+    total: Int!
+    users: [User!]
   }
 
   type Event {
