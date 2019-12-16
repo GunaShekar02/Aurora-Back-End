@@ -3,6 +3,8 @@ const { gql } = require('apollo-server-express');
 const typeDefs = gql`
   type Query {
     user: User!
+    publicUser(arId: String!): PublicUser
+    publicUsers(arIds: [String!]!): [PublicUser]!
   }
 
   type Event {
