@@ -304,7 +304,7 @@ const data = [
       fee: 349,
       isNameRequired: true,
       maxSize: 5,
-      parentEvent: 'gaming',
+      parentEvent: 'gamiacs',
     },
   ],
   [
@@ -315,7 +315,7 @@ const data = [
       fee: 199,
       isNameRequired: true,
       maxSize: 4,
-      parentEvent: 'gaming',
+      parentEvent: 'gamiacs',
     },
   ],
 ];
