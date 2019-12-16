@@ -1,6 +1,9 @@
 const user = require('./resolvers/query/user');
 const publicUser = require('./resolvers/query/publicUser');
 const publicUsers = require('./resolvers/query/publicUsers');
+const allUsers = require('./resolvers/query/protected/allUsers');
+const allTeams = require('./resolvers/query/protected/allTeams');
+const eventTeams = require('./resolvers/query/protected/eventTeams');
 
 const signup = require('./resolvers/mutation/signup');
 const login = require('./resolvers/mutation/login');
@@ -29,6 +32,9 @@ const resolvers = {
     user,
     publicUser,
     publicUsers,
+    allUsers,
+    allTeams,
+    eventTeams,
   },
   Mutation: {
     signup,

@@ -1,3 +1,6 @@
+const crypto = require('crypto');
+const { rzpOptions } = require('./config');
+
 const generateRandomNumber = () => {
   return Math.floor(Math.random() * 899 + 100);
 };
@@ -41,13 +44,22 @@ const generateTeamId = async (arId, eventId, db) => {
   return newTeamId;
 };
 
-const generateReceipt = async (arId, db) => {
+const generateReceipt = async (arId, db, collection) => {
   const randomNumber = Math.floor(Math.random() * 899999 + 100000);
   const receipt = `${arId}-${randomNumber}`;
-  const verifyReceipt = await db.collection('orders').findOne({ receipt });
+  const verifyReceipt = await db.collection(collection).findOne({ receipt });
   if (!verifyReceipt) return receipt;
-  const newReceipt = await generateReceipt(arId, db);
+  const newReceipt = await generateReceipt(arId, db, collection);
   return newReceipt;
 };
 
-module.exports = { generateArId, generateTeamId, generateReceipt };
+const verifyRzpSignature = (orderId, paymentId, signature) => {
+  const generatedSignature = crypto
+    .createHmac('SHA256', rzpOptions.key_secret)
+    .update(`${orderId}|${paymentId}`)
+    .digest('hex');
+
+  return generatedSignature === signature;
+};
+
+module.exports = { generateArId, generateTeamId, generateReceipt, verifyRzpSignature };

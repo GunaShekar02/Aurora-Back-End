@@ -2,6 +2,7 @@ const { UserInputError, ApolloError } = require('apollo-server-express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+const userData = require('../../data/userData');
 const { jwtSecret } = require('../../utils/config');
 
 const login = async (_, args, context) => {
@@ -15,10 +16,28 @@ const login = async (_, args, context) => {
     if (user.isVerified) {
       const match = await bcrypt.compare(password, user.hash);
       if (match) {
-        const payload = {
-          email: user.email,
-          id: user._id,
-        };
+        const userD = userData.get(user._id);
+        let payload;
+
+        if (userD && userD.isRoot) {
+          payload = {
+            email: user.email,
+            id: user._id,
+            role: 'root',
+          };
+        } else if (userD && userD.isEventAdmin) {
+          payload = {
+            email: user.email,
+            id: user._id,
+            role: 'evtAdm',
+          };
+        } else {
+          payload = {
+            email: user.email,
+            id: user._id,
+          };
+        }
+
         const token = jwt.sign(payload, jwtSecret.privKey, {
           algorithm: 'ES512',
           expiresIn: '30d',

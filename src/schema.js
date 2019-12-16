@@ -5,6 +5,19 @@ const typeDefs = gql`
     user: User!
     publicUser(arId: String!): PublicUser
     publicUsers(arIds: [String!]!): [PublicUser]!
+    allUsers(limit: Int, page: Int, sortBy: String, sortDir: Int): UserQueryRes
+    allTeams(limit: Int, page: Int, sortBy: String, sortDir: Int): TeamQueryRes
+    eventTeams(eventId: Int, limit: Int, page: Int, sortBy: String, sortDir: Int): TeamQueryRes
+  }
+
+  type UserQueryRes {
+    total: Int!
+    users: [User!]
+  }
+
+  type TeamQueryRes {
+    total: Int!
+    teams: [Team!]
   }
 
   type Event {
