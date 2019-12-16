@@ -3,8 +3,6 @@ const { gql } = require('apollo-server-express');
 const typeDefs = gql`
   type Query {
     user: User!
-    publicUser(arId: String!): PublicUser
-    publicUsers(arIds: [String!]!): [PublicUser]!
   }
 
   type Event {
@@ -32,24 +30,18 @@ const typeDefs = gql`
     timeSt: String!
   }
 
-  type PublicUser {
-    id: String!
-    name: String!
-    displayPic: String!
-  }
-
   type Team {
     id: String!
     name: String
     event: Event!
-    members: [PublicUser!]!
+    members: [User!]!
     paymentStatus: Boolean!
-    pendingInvitations: [PublicUser!]
+    pendingInvitations: [User!]
   }
 
   type TeamInvitation {
     team: Team!
-    invitedBy: PublicUser!
+    invitedBy: User!
   }
 
   type Mutation {
@@ -68,7 +60,7 @@ const typeDefs = gql`
     sendInvite(teamId: String!, arId: String!): EventResponse
     cancelInvite(teamId: String!, arId: String!): EventResponse
     acceptInvite(teamId: String!): EventResponse
-    declineInvite(teamId: String!): EventResponse
+    declineInvite(teamId: String!): UserResponse
     removeMember(teamId: String!, arId: String!): EventResponse
     leaveTeam(teamId: String!): UserResponse
     pay(teamId: String!): UserResponse
