@@ -1,14 +1,14 @@
 const { ApolloError } = require('apollo-server-express');
 const { verifyRzpSignature } = require('../../utils/helpers');
 
-const verifyEventOrder = async (_, args, context) => {
+const verifyAccOrder = async (_, args, context) => {
   const { id, db, logger, client, rzp } = context;
   const { orderId, paymentId, signature } = args;
 
   const isSignatureValid = verifyRzpSignature(orderId, paymentId, signature);
   if (!isSignatureValid) throw new ApolloError('Invalid payment signature', 'INVALID_SIGNATURE');
 
-  const order = await db.collection('orders').findOne({ orderId });
+  const order = await db.collection('accOrders').findOne({ orderId });
   if (!order) throw new ApolloError('OrderID does not exist', 'INVALID_ORDER');
 
   const orderData = await rzp.orders.fetch(orderId);
@@ -25,8 +25,8 @@ const verifyEventOrder = async (_, args, context) => {
 
   try {
     await session.withTransaction(async () => {
-      const teamsCollection = db.collection('teams');
-      const ordersCollection = db.collection('orders');
+      const usersCollection = db.collection('users');
+      const ordersCollection = db.collection('accOrders');
 
       const orderRes = ordersCollection.updateOne(
         { orderId },
@@ -40,13 +40,13 @@ const verifyEventOrder = async (_, args, context) => {
         { session }
       );
 
-      const teamRes = teamsCollection.updateMany(
-        { _id: { $in: order.teams } },
-        { $set: { paymentStatus: true } },
+      const userRes = usersCollection.updateMany(
+        { _id: { $in: order.users } },
+        { $set: { accomodation: true } },
         { session }
       );
 
-      return Promise.all([orderRes, teamRes]);
+      return Promise.all([orderRes, userRes]);
     });
   } catch (err) {
     logger('[VERIFY_ORDER]', '[TRX_ERR]', err);
@@ -66,4 +66,4 @@ const verifyEventOrder = async (_, args, context) => {
   };
 };
 
-module.exports = verifyEventOrder;
+module.exports = verifyAccOrder;

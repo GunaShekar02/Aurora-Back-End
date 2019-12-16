@@ -43,6 +43,7 @@ const config = {
     key_secret: RZP_KEY_SECRET,
   },
   extraCharges: 2.42,
+  accomodationFee: 799,
 };
 
 module.exports = config;
