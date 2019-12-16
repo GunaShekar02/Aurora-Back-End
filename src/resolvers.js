@@ -1,4 +1,6 @@
 const user = require('./resolvers/query/user');
+const publicUser = require('./resolvers/query/publicUser');
+const publicUsers = require('./resolvers/query/publicUsers');
 
 const signup = require('./resolvers/mutation/signup');
 const login = require('./resolvers/mutation/login');
@@ -22,6 +24,8 @@ const Event = require('./resolvers/custom/Event');
 const resolvers = {
   Query: {
     user,
+    publicUser,
+    publicUsers,
   },
   Mutation: {
     signup,
