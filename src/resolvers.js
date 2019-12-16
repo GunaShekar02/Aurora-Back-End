@@ -1,4 +1,6 @@
 const user = require('./resolvers/query/user');
+const publicUser = require('./resolvers/query/publicUser');
+const publicUsers = require('./resolvers/query/publicUsers');
 
 const signup = require('./resolvers/mutation/signup');
 const login = require('./resolvers/mutation/login');
@@ -18,12 +20,15 @@ const generateEventOrder = require('./resolvers/mutation/generateEventOrder');
 const verifyEventOrder = require('./resolvers/mutation/verifyEventOrder');
 
 const User = require('./resolvers/custom/User');
+const PublicUser = require('./resolvers/custom/PublicUser');
 const Team = require('./resolvers/custom/Team');
 const Event = require('./resolvers/custom/Event');
 
 const resolvers = {
   Query: {
     user,
+    publicUser,
+    publicUsers,
   },
   Mutation: {
     signup,
@@ -44,6 +49,7 @@ const resolvers = {
     verifyEventOrder,
   },
   User,
+  PublicUser,
   Team,
   Event,
 };
