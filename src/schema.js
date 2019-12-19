@@ -91,6 +91,8 @@ const typeDefs = gql`
     setTeamName(teamId: String!, name: String!): EventResponse
     generateEventOrder(teamIds: [String!]!): OrderResponse
     verifyEventOrder(orderId: String!, paymentId: String!, signature: String!): UserResponse
+    generateAccOrder(userIds: [String!]!): OrderResponse
+    verifyAccOrder(orderId: String!, paymentId: String!, signature: String!): UserResponse
   }
 
   type EventResponse {

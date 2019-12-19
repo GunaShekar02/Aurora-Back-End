@@ -21,6 +21,8 @@ const resetPassword = require('./resolvers/mutation/resetPassword');
 const setTeamName = require('./resolvers/mutation/setTeamName');
 const generateEventOrder = require('./resolvers/mutation/generateEventOrder');
 const verifyEventOrder = require('./resolvers/mutation/verifyEventOrder');
+const generateAccOrder = require('./resolvers/mutation/generateAccOrder');
+const verifyAccOrder = require('./resolvers/mutation/verifyAccOrder');
 
 const User = require('./resolvers/custom/User');
 const PublicUser = require('./resolvers/custom/PublicUser');
@@ -53,6 +55,8 @@ const resolvers = {
     setTeamName,
     generateEventOrder,
     verifyEventOrder,
+    generateAccOrder,
+    verifyAccOrder,
   },
   User,
   PublicUser,

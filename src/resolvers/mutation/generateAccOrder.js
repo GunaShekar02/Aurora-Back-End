@@ -4,9 +4,12 @@ const { generateReceipt } = require('../../utils/helpers');
 
 const generateAccOrder = async (_, args, context) => {
   const { isValid, id, db, logger, userLoader, rzp } = context;
-  const { userIds } = args;
+  const userIds = args.userIds.map(user => user.toUpperCase());
 
   if (isValid) {
+    if (!userIds.some(user => user === id))
+      throw new ApolloError('User not it given user ids', 'USER_NOT_FOUND');
+
     const users = await userLoader.loadMany(userIds);
 
     if (users.some(user => user === null)) throw new ApolloError('Invalid User ID', 'INVALID_USER');
