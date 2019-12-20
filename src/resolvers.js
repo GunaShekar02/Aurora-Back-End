@@ -4,6 +4,7 @@ const publicUsers = require('./resolvers/query/publicUsers');
 const allUsers = require('./resolvers/query/protected/allUsers');
 const allTeams = require('./resolvers/query/protected/allTeams');
 const eventTeams = require('./resolvers/query/protected/eventTeams');
+const adminMetadata = require('./resolvers/query/protected/adminMetadata');
 
 const signup = require('./resolvers/mutation/signup');
 const login = require('./resolvers/mutation/login');
@@ -37,6 +38,7 @@ const resolvers = {
     allUsers,
     allTeams,
     eventTeams,
+    adminMetadata,
   },
   Mutation: {
     signup,
@@ -61,6 +63,7 @@ const resolvers = {
   User,
   PublicUser,
   Team,
+  PrivateTeam: Team,
   Event,
 };
 

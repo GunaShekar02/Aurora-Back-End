@@ -1,5 +1,12 @@
 const data = [
   [
+    'PK-DEV-421',
+    {
+      isEventAdmin: true,
+      eventIds: [1, 2, 3, 4, 23, 25, 26, 27, 28, 29],
+    },
+  ],
+  [
     'PK-DEV-420',
     {
       isRoot: true,
