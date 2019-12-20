@@ -8,6 +8,7 @@ const typeDefs = gql`
     allUsers(limit: Int, page: Int, sortBy: String, sortDir: Int): UserQueryRes
     allTeams(limit: Int, page: Int, sortBy: String, sortDir: Int): TeamQueryRes
     eventTeams(eventId: Int, limit: Int, page: Int, sortBy: String, sortDir: Int): TeamQueryRes
+    adminMetadata: AdminRes
   }
 
   type UserQueryRes {
@@ -17,7 +18,13 @@ const typeDefs = gql`
 
   type TeamQueryRes {
     total: Int!
-    teams: [Team!]
+    teams: [PrivateTeam!]
+  }
+
+  type AdminRes {
+    isRoot: Boolean!
+    isEventAdmin: Boolean!
+    events: [Event!]
   }
 
   type Event {
@@ -58,6 +65,15 @@ const typeDefs = gql`
     members: [PublicUser!]!
     paymentStatus: Boolean!
     pendingInvitations: [PublicUser!]
+  }
+
+  type PrivateTeam {
+    id: String!
+    name: String
+    event: Event!
+    members: [User!]!
+    paymentStatus: Boolean!
+    pendingInvitations: [User!]
   }
 
   type TeamInvitation {
