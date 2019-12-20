@@ -3,6 +3,21 @@ const { gql } = require('apollo-server-express');
 const typeDefs = gql`
   type Query {
     user: User!
+    publicUser(arId: String!): PublicUser
+    publicUsers(arIds: [String!]!): [PublicUser]!
+    allUsers(limit: Int, page: Int, sortBy: String, sortDir: Int): UserQueryRes
+    allTeams(limit: Int, page: Int, sortBy: String, sortDir: Int): TeamQueryRes
+    eventTeams(eventId: Int, limit: Int, page: Int, sortBy: String, sortDir: Int): TeamQueryRes
+  }
+
+  type UserQueryRes {
+    total: Int!
+    users: [User!]
+  }
+
+  type TeamQueryRes {
+    total: Int!
+    teams: [Team!]
   }
 
   type Event {
@@ -30,18 +45,24 @@ const typeDefs = gql`
     timeSt: String!
   }
 
+  type PublicUser {
+    id: String!
+    name: String!
+    displayPic: String!
+  }
+
   type Team {
     id: String!
     name: String
     event: Event!
-    members: [User!]!
+    members: [PublicUser!]!
     paymentStatus: Boolean!
-    pendingInvitations: [User!]
+    pendingInvitations: [PublicUser!]
   }
 
   type TeamInvitation {
     team: Team!
-    invitedBy: User!
+    invitedBy: PublicUser!
   }
 
   type Mutation {
@@ -60,7 +81,7 @@ const typeDefs = gql`
     sendInvite(teamId: String!, arId: String!): EventResponse
     cancelInvite(teamId: String!, arId: String!): EventResponse
     acceptInvite(teamId: String!): EventResponse
-    declineInvite(teamId: String!): UserResponse
+    declineInvite(teamId: String!): EventResponse
     removeMember(teamId: String!, arId: String!): EventResponse
     leaveTeam(teamId: String!): UserResponse
     pay(teamId: String!): UserResponse
@@ -70,6 +91,8 @@ const typeDefs = gql`
     setTeamName(teamId: String!, name: String!): EventResponse
     generateEventOrder(teamIds: [String!]!): OrderResponse
     verifyEventOrder(orderId: String!, paymentId: String!, signature: String!): UserResponse
+    generateAccOrder(userIds: [String!]!): OrderResponse
+    verifyAccOrder(orderId: String!, paymentId: String!, signature: String!): UserResponse
   }
 
   type EventResponse {

@@ -21,7 +21,7 @@ const generateEventOrder = async (_, args, context) => {
     const totalAmount = teams.reduce((acc, team) => acc + eventData.get(team.event).fee, 0);
 
     if (totalAmount > 0) {
-      const receipt = await generateReceipt(id, db);
+      const receipt = await generateReceipt(id, db, 'orders');
 
       const finalAmount = Math.floor(totalAmount * 100 + totalAmount * extraCharges);
 

@@ -1,4 +1,9 @@
 const user = require('./resolvers/query/user');
+const publicUser = require('./resolvers/query/publicUser');
+const publicUsers = require('./resolvers/query/publicUsers');
+const allUsers = require('./resolvers/query/protected/allUsers');
+const allTeams = require('./resolvers/query/protected/allTeams');
+const eventTeams = require('./resolvers/query/protected/eventTeams');
 
 const signup = require('./resolvers/mutation/signup');
 const login = require('./resolvers/mutation/login');
@@ -16,14 +21,22 @@ const resetPassword = require('./resolvers/mutation/resetPassword');
 const setTeamName = require('./resolvers/mutation/setTeamName');
 const generateEventOrder = require('./resolvers/mutation/generateEventOrder');
 const verifyEventOrder = require('./resolvers/mutation/verifyEventOrder');
+const generateAccOrder = require('./resolvers/mutation/generateAccOrder');
+const verifyAccOrder = require('./resolvers/mutation/verifyAccOrder');
 
 const User = require('./resolvers/custom/User');
+const PublicUser = require('./resolvers/custom/PublicUser');
 const Team = require('./resolvers/custom/Team');
 const Event = require('./resolvers/custom/Event');
 
 const resolvers = {
   Query: {
     user,
+    publicUser,
+    publicUsers,
+    allUsers,
+    allTeams,
+    eventTeams,
   },
   Mutation: {
     signup,
@@ -42,8 +55,11 @@ const resolvers = {
     setTeamName,
     generateEventOrder,
     verifyEventOrder,
+    generateAccOrder,
+    verifyAccOrder,
   },
   User,
+  PublicUser,
   Team,
   Event,
 };
