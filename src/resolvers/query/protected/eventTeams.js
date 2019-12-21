@@ -1,9 +1,7 @@
 const { AuthenticationError, ApolloError } = require('apollo-server-express');
 
-const userData = require('../../../data/userData');
-
 const eventTeams = async (_, args, context) => {
-  const { id, isValid, isEventAdmin, isRoot, db } = context;
+  const { isValid, isEventAdmin, isRoot, db, eventIds } = context;
 
   if (isValid && (isEventAdmin || isRoot)) {
     const eventId = args.eventId || 1;
@@ -12,9 +10,7 @@ const eventTeams = async (_, args, context) => {
     const sortBy = args.sortBy || 'none'; // dummy field
     const sortDir = args.sortDir || -1;
 
-    const userD = userData.get(id);
-
-    if (!(isRoot || userD.eventIds.some(eId => eId === eventId)))
+    if (!(isRoot || eventIds.some(eId => eId === eventId)))
       throw new ApolloError('Invalid eventId', 'INVALID_EVENTID');
 
     const cursor = await db
