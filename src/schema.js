@@ -109,6 +109,8 @@ const typeDefs = gql`
     verifyEventOrder(orderId: String!, paymentId: String!, signature: String!): UserResponse
     generateAccOrder(userIds: [String!]!): OrderResponse
     verifyAccOrder(orderId: String!, paymentId: String!, signature: String!): UserResponse
+    makeEventAdmin(arId: String!, eventIds: [Int!]!): MutationResponse
+    impersonate(arId: String!): String!
   }
 
   type EventResponse {
