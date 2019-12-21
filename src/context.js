@@ -18,6 +18,7 @@ const provideContext = async (request, database, client) => {
     isValid: false,
     isRoot: false,
     isEventAdmin: false,
+    eventIds: [],
     token: null,
     email: null,
     id: null,
@@ -45,7 +46,10 @@ const provideContext = async (request, database, client) => {
       const role = decoded.role || null;
 
       if (role && role === 'root') payload.isRoot = true;
-      else if (role && role === 'evtAdm') payload.isEventAdmin = true;
+      else if (role && role === 'evtAdm') {
+        payload.isEventAdmin = true;
+        payload.eventIds = decoded.evt;
+      }
 
       logger('userId=>', decoded.id, 'email=>', decoded.email, 'role=>', role, '\n');
     } catch (err) {
