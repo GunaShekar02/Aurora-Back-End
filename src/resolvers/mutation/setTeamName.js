@@ -1,11 +1,21 @@
 const { ApolloError, AuthenticationError } = require('apollo-server-express');
+const xss = require('xss');
 
 const setTeamName = async (_, args, context) => {
   const { isValid, db, client, id, teamLoader, logger } = context;
 
   if (isValid) {
     const teamId = args.teamId.toUpperCase();
-    const { name } = args;
+
+    const xssOptions = {
+      whiteList: [],
+      stripIgnoreTag: [],
+      stripIgnoreTagBody: ['script'],
+    };
+
+    const name = xss(args.name, xssOptions);
+
+    if (!name) throw new ApolloError('Invalid name', 'INVALID_NAME');
 
     const team = await teamLoader.load(teamId);
     if (!team) throw new ApolloError('Invalid team', 'INVALID_TEAM');
