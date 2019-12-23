@@ -42,7 +42,7 @@ const verifyAccOrder = async (_, args, context) => {
 
       const userRes = usersCollection.updateMany(
         { _id: { $in: order.users } },
-        { $set: { accomodation: true } },
+        { $set: { accommodation: true } },
         { session }
       );
 
