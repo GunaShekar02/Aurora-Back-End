@@ -14,7 +14,7 @@ const generateAccOrder = async (_, args, context) => {
 
     if (users.some(user => user === null)) throw new ApolloError('Invalid User ID', 'INVALID_USER');
 
-    if (users.some(user => user.accomodation === true))
+    if (users.some(user => user.accommodation === true))
       throw new ApolloError('Some user(s) already have accomodation', 'USR_HAVE_ACC');
 
     const totalAmount = users.length * accomodationFee;
