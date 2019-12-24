@@ -1,6 +1,7 @@
 const { UserInputError, ApolloError } = require('apollo-server-express');
 const bcrypt = require('bcrypt');
 
+const xss = require('xss');
 const { generateArId } = require('../../utils/helpers');
 const getConfirmEmail = require('../../utils/emails/emailConfirm');
 
@@ -8,8 +9,20 @@ const mailer = require('../../utils/mailer');
 
 const signup = async (_, args, context) => {
   const { db, client, logger } = context;
-  const { password, name, college, phone, gender, city } = args;
-  const email = args.email.toLowerCase();
+  let email = args.email.toLowerCase();
+
+  const xssOptions = {
+    whiteList: [],
+    stripIgnoreTag: [],
+    stripIgnoreTagBody: ['script'],
+  };
+  email = xss(args.email, xssOptions);
+  const password = xss(args.password, xssOptions);
+  const name = xss(args.name, xssOptions);
+  const college = xss(args.college, xssOptions);
+  const city = xss(args.city, xssOptions);
+  const phone = xss(args.phone, xssOptions);
+  const gender = xss(args.gender, xssOptions);
 
   if (
     name === '' ||

@@ -5,7 +5,7 @@ const eventTeams = async (_, args, context) => {
 
   if (isValid && (isEventAdmin || isRoot)) {
     const eventId = args.eventId || 1;
-    const limit = args.limit || 25;
+    const limit = args.limit || 0;
     const page = args.page || 0;
     const sortBy = args.sortBy || 'none'; // dummy field
     const sortDir = args.sortDir || -1;
@@ -13,13 +13,16 @@ const eventTeams = async (_, args, context) => {
     if (!(isRoot || eventIds.some(eId => eId === eventId)))
       throw new ApolloError('Invalid eventId', 'INVALID_EVENTID');
 
+    const total = await db
+      .collection('teams')
+      .find({ event: eventId })
+      .count();
+
     const cursor = await db
       .collection('teams')
       .find({ event: eventId })
       .sort([[sortBy, sortDir]])
       .project({ _id: 1 });
-
-    const total = await cursor.count();
 
     const teamRes = await cursor
       .skip(page * limit)
