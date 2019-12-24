@@ -5,7 +5,14 @@ const typeDefs = gql`
     user: User!
     publicUser(arId: String!): PublicUser
     publicUsers(arIds: [String!]!): [PublicUser]!
-    allUsers(limit: Int, page: Int, sortBy: String, sortDir: Int): UserQueryRes
+    allUsers(
+      limit: Int
+      page: Int
+      sortBy: String
+      sortDir: Int
+      filterBy: String
+      pattern: String
+    ): UserQueryRes
     allTeams(limit: Int, page: Int, sortBy: String, sortDir: Int): TeamQueryRes
     eventTeams(eventId: Int, limit: Int, page: Int, sortBy: String, sortDir: Int): TeamQueryRes
     adminMetadata: AdminRes
