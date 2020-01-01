@@ -1,8 +1,9 @@
 const { ApolloError } = require('apollo-server-express');
 const { verifyRzpSignature } = require('../../utils/helpers');
+const offerRefund = require('../../utils/offerRefund');
 
 const verifyAccOrder = async (_, args, context) => {
-  const { id, db, logger, client, rzp } = context;
+  const { id, db, logger, client, rzp, userLoader } = context;
   const { orderId, paymentId, signature } = args;
 
   const isSignatureValid = verifyRzpSignature(orderId, paymentId, signature);
@@ -14,6 +15,28 @@ const verifyAccOrder = async (_, args, context) => {
   const orderData = await rzp.orders.fetch(orderId);
 
   logger('[VERIFY_ACC_ORDER]', 'orderData =>', orderData);
+
+  const users = await userLoader.loadMany(order.users);
+
+  const fullUsers = [];
+  const hundredUsers = [];
+  const fiftyUsers = [];
+  const noRefundUsers = [];
+  for (let i = 0; i < users.length; i += 1) {
+    const user = users[i];
+    const { paid, gotEvtOffer } = user.pronite;
+    if (paid) {
+      if (gotEvtOffer === 'none') fullUsers.push(user);
+      else if (gotEvtOffer === 'fifty') fiftyUsers.push(user);
+      else if (gotEvtOffer === 'hundred') hundredUsers.push(user);
+    } else {
+      noRefundUsers.push(user);
+    }
+  }
+
+  fullUsers.forEach(user => offerRefund(user, 349, rzp, db));
+  fiftyUsers.forEach(user => offerRefund(user, 299, rzp, db));
+  hundredUsers.forEach(user => offerRefund(user, 249, rzp, db));
 
   const session = client.startSession({
     defaultTransactionOptions: {
@@ -42,11 +65,29 @@ const verifyAccOrder = async (_, args, context) => {
 
       const userRes = usersCollection.updateMany(
         { _id: { $in: order.users } },
-        { $set: { accommodation: true } },
+        { $set: { accommodation: true, 'pronite.paid': true, 'pronite.gotAccOffer': true } },
         { session }
       );
 
-      return Promise.all([orderRes, userRes]);
+      const fullRes = usersCollection.updateMany(
+        { _id: { $in: fullUsers.map(u => u._id) } },
+        { $inc: { 'pronite.refundedAmount': 349 } },
+        { session }
+      );
+
+      const fiftyRes = usersCollection.updateMany(
+        { _id: { $in: fiftyUsers.map(u => u._id) } },
+        { $inc: { 'pronite.refundedAmount': 299 } },
+        { session }
+      );
+
+      const hundredRes = usersCollection.updateMany(
+        { _id: { $in: hundredUsers.map(u => u._id) } },
+        { $inc: { 'pronite.refundedAmount': 249 } },
+        { session }
+      );
+
+      return Promise.all([orderRes, userRes, fullRes, fiftyRes, hundredRes]);
     });
   } catch (err) {
     logger('[VERIFY_ORDER]', '[TRX_ERR]', err);
