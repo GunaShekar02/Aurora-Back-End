@@ -13,7 +13,7 @@ const verifyAccOrder = async (_, args, context) => {
 
   const orderData = await rzp.orders.fetch(orderId);
 
-  logger('[VERIFY_ORDER]', 'orderData =>', orderData);
+  logger('[VERIFY_ACC_ORDER]', 'orderData =>', orderData);
 
   const session = client.startSession({
     defaultTransactionOptions: {
