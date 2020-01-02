@@ -34,9 +34,9 @@ const verifyAccOrder = async (_, args, context) => {
     }
   }
 
-  fullUsers.forEach(user => offerRefund(user, 349, rzp, db));
-  fiftyUsers.forEach(user => offerRefund(user, 299, rzp, db));
-  hundredUsers.forEach(user => offerRefund(user, 249, rzp, db));
+  fullUsers.forEach(user => offerRefund(user, 349, rzp, db, 'acc'));
+  fiftyUsers.forEach(user => offerRefund(user, 299, rzp, db, 'acc'));
+  hundredUsers.forEach(user => offerRefund(user, 249, rzp, db, 'acc'));
 
   const session = client.startSession({
     defaultTransactionOptions: {

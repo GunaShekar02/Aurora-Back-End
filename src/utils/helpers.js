@@ -92,10 +92,22 @@ const isEligibleForEvtRefund = (user, teams) => {
   return 'none';
 };
 
+const getEventOffer = events => {
+  const hasEligibleBigEvent = events.some(evt => eventMap.get(evt).hasOffer === 'hundred');
+  if (hasEligibleBigEvent) return 'hundred';
+
+  const eligibleSmallEvent = events.filter(evt => eventMap.get(evt).hasOffer === 'fifty');
+  const el = eligibleSmallEvent.length;
+  if (el === 1) return 'fifty';
+  if (el >= 2) return 'hundred';
+  return 'none';
+};
+
 module.exports = {
   generateArId,
   generateTeamId,
   generateReceipt,
   verifyRzpSignature,
   isEligibleForEvtRefund,
+  getEventOffer,
 };
