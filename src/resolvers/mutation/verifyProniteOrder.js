@@ -96,6 +96,7 @@ const verifyProniteOrder = async (_, args, context) => {
     throw new ApolloError('Something went wrong', 'TRX_FAILED');
   } finally {
     // teamLoader.clear(teamId);
+    userLoader.clear(id);
     await session.endSession();
   }
 

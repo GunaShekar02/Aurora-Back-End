@@ -21,14 +21,15 @@ const verifyEventOrder = async (_, args, context) => {
   for (let i = 0; i < teams.length; i += 1) {
     const team = teams[i];
     team.members.forEach(uid => {
-      let item = [];
-      if (userMap.has(uid)) item = userMap.get(uid).push(team.event);
-      else item = [team.event];
+      const item = userMap.has(uid) ? userMap.get(uid) : [];
+      item.push(team.event);
 
       userMap.set(uid, item);
     });
   }
-  const users = userLoader.loadMany(userMap.keys());
+  console.log(userMap);
+  const uids = Array.from(userMap.keys());
+  const users = await userLoader.loadMany(uids);
 
   const hundredUsers = []; // status hundred, refund 100
   const hundredFiftyUsers = []; // status hundred, refund 50
@@ -51,9 +52,7 @@ const verifyEventOrder = async (_, args, context) => {
     }
   }
 
-  hundredUsers.forEach(user => offerRefund(user, 100, rzp, db, 'evt'));
-  hundredFiftyUsers.forEach(user => offerRefund(user, 50, rzp, db, 'evt'));
-  fiftyUsers.forEach(user => offerRefund(user, 50, rzp, db, 'evt'));
+  logger('arey', hundredUsers, hundredFiftyUsers, fiftyUsers);
 
   const session = client.startSession({
     defaultTransactionOptions: {
@@ -88,23 +87,42 @@ const verifyEventOrder = async (_, args, context) => {
       );
 
       const userHundredRes = usersCollection.updateMany(
-        { _id: { $in: hundredUsers.concat(hundredFiftyUsers).map(u => u._id) } },
-        { $set: { 'pronite.gotEvtOffer': 'hundred' } },
+        { _id: { $in: hundredUsers.map(u => u._id) } },
+        {
+          $set: { 'pronite.gotEvtOffer': 'hundred' },
+          $inc: { 'pronite.refundedAmount': 100 },
+        },
+        { session }
+      );
+      const userHundredFiftyRes = usersCollection.updateMany(
+        { _id: { $in: hundredFiftyUsers.map(u => u._id) } },
+        {
+          $set: { 'pronite.gotEvtOffer': 'hundred' },
+          $inc: { 'pronite.refundedAmount': 50 },
+        },
         { session }
       );
       const userFiftyRes = usersCollection.updateMany(
         { _id: { $in: fiftyUsers.map(u => u._id) } },
-        { $set: { 'pronite.gotEvtOffer': 'fifty' } },
+        {
+          $set: { 'pronite.gotEvtOffer': 'fifty' },
+          $inc: { 'pronite.refundedAmount': 50 },
+        },
         { session }
       );
 
-      return Promise.all([orderRes, teamRes, userHundredRes, userFiftyRes]);
+      return Promise.all([orderRes, teamRes, userHundredRes, userHundredFiftyRes, userFiftyRes]);
     });
+
+    hundredUsers.forEach(user => offerRefund(user, 100, rzp, db, 'evt'));
+    hundredFiftyUsers.forEach(user => offerRefund(user, 50, rzp, db, 'evt'));
+    fiftyUsers.forEach(user => offerRefund(user, 50, rzp, db, 'evt'));
   } catch (err) {
     logger('[VERIFY_ORDER]', '[TRX_ERR]', err);
     throw new ApolloError('Something went wrong', 'TRX_FAILED');
   } finally {
     // teamLoader.clear(teamId);
+    order.teams.forEach(tid => teamLoader.clear(tid));
     await session.endSession();
   }
 

@@ -34,10 +34,6 @@ const verifyAccOrder = async (_, args, context) => {
     }
   }
 
-  fullUsers.forEach(user => offerRefund(user, 349, rzp, db, 'acc'));
-  fiftyUsers.forEach(user => offerRefund(user, 299, rzp, db, 'acc'));
-  hundredUsers.forEach(user => offerRefund(user, 249, rzp, db, 'acc'));
-
   const session = client.startSession({
     defaultTransactionOptions: {
       readConcern: { level: 'local' },
@@ -89,11 +85,16 @@ const verifyAccOrder = async (_, args, context) => {
 
       return Promise.all([orderRes, userRes, fullRes, fiftyRes, hundredRes]);
     });
+
+    fullUsers.forEach(user => offerRefund(user, 349, rzp, db, 'acc'));
+    fiftyUsers.forEach(user => offerRefund(user, 299, rzp, db, 'acc'));
+    hundredUsers.forEach(user => offerRefund(user, 249, rzp, db, 'acc'));
   } catch (err) {
     logger('[VERIFY_ORDER]', '[TRX_ERR]', err);
     throw new ApolloError('Something went wrong', 'TRX_FAILED');
   } finally {
     // teamLoader.clear(teamId);
+    userLoader.clear(id);
     await session.endSession();
   }
 
