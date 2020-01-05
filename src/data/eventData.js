@@ -26,7 +26,7 @@ const data = [
     {
       id: 3,
       name: 'Mr. and Ms. Aurora',
-      fee: 500,
+      fee: 249,
       isNameRequired: false,
       maxSize: 1,
       parentEvent: 'mnm',
