@@ -54,6 +54,7 @@ const typeDefs = gql`
     displayPic: String!
     isVerified: Boolean!
     accommodation: Boolean!
+    pronite: Boolean!
     teams: [Team!]
     teamInvitations: [TeamInvitation!]
     timeSt: String!
@@ -116,6 +117,8 @@ const typeDefs = gql`
     verifyEventOrder(orderId: String!, paymentId: String!, signature: String!): UserResponse
     generateAccOrder(userIds: [String!]!): OrderResponse
     verifyAccOrder(orderId: String!, paymentId: String!, signature: String!): UserResponse
+    generateProniteOrder(userIds: [String!]!): OrderResponse
+    verifyProniteOrder(orderId: String!, paymentId: String!, signature: String!): UserResponse
     makeEventAdmin(arId: String!, eventIds: [Int!]!): MutationResponse
     impersonate(arId: String!): String!
   }

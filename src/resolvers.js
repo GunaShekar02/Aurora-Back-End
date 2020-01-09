@@ -21,10 +21,13 @@ const verifyRegister = require('./resolvers/mutation/verifyRegister');
 const forgotPassword = require('./resolvers/mutation/forgotPassword');
 const resetPassword = require('./resolvers/mutation/resetPassword');
 const setTeamName = require('./resolvers/mutation/setTeamName');
+
 const generateEventOrder = require('./resolvers/mutation/generateEventOrder');
 const verifyEventOrder = require('./resolvers/mutation/verifyEventOrder');
 const generateAccOrder = require('./resolvers/mutation/generateAccOrder');
 const verifyAccOrder = require('./resolvers/mutation/verifyAccOrder');
+const generateProniteOrder = require('./resolvers/mutation/generateProniteOrder');
+const verifyProniteOrder = require('./resolvers/mutation/verifyProniteOrder');
 
 const makeEventAdmin = require('./resolvers/mutation/admin/makeEventAdmin');
 const impersonate = require('./resolvers/mutation/admin/impersonate');
@@ -63,6 +66,8 @@ const resolvers = {
     verifyEventOrder,
     generateAccOrder,
     verifyAccOrder,
+    generateProniteOrder,
+    verifyProniteOrder,
     makeEventAdmin,
     impersonate,
   },

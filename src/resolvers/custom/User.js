@@ -54,6 +54,11 @@ const User = {
     const user = await userLoader.load(id);
     return user.accommodation;
   },
+  pronite: async (args, __, { userLoader }) => {
+    const { id } = args;
+    const user = await userLoader.load(id);
+    return user.pronite.paid;
+  },
   teamInvitations: async (args, __, { userLoader }) => {
     const { id } = args;
     const user = await userLoader.load(id);
