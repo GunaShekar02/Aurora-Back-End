@@ -16,7 +16,7 @@ const signup = async (_, args, context) => {
     stripIgnoreTag: [],
     stripIgnoreTagBody: ['script'],
   };
-  email = xss(args.email, xssOptions);
+  email = xss(email, xssOptions);
   const password = xss(args.password, xssOptions);
   const name = xss(args.name, xssOptions);
   const college = xss(args.college, xssOptions);
