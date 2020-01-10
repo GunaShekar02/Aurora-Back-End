@@ -1,6 +1,6 @@
 const { ApolloError } = require('apollo-server-express');
 const { verifyRzpSignature } = require('../../utils/helpers');
-const offerRefund = require('../../utils/offerRefund');
+const refundUsers = require('../../utils/offerRefund');
 
 const verifyAccOrder = async (_, args, context) => {
   const { id, db, logger, client, rzp, userLoader } = context;
@@ -86,9 +86,12 @@ const verifyAccOrder = async (_, args, context) => {
       return Promise.all([orderRes, userRes, fullRes, fiftyRes, hundredRes]);
     });
 
-    fullUsers.forEach(user => offerRefund(user, 349, rzp, db, 'acc'));
-    fiftyUsers.forEach(user => offerRefund(user, 299, rzp, db, 'acc'));
-    hundredUsers.forEach(user => offerRefund(user, 249, rzp, db, 'acc'));
+    const refund = async () => {
+      await refundUsers(fullUsers, 349, rzp, db, 'acc');
+      await refundUsers(fiftyUsers, 299, rzp, db, 'acc');
+      await refundUsers(hundredUsers, 249, rzp, db, 'acc');
+    };
+    refund();
   } catch (err) {
     logger('[VERIFY_ORDER]', '[TRX_ERR]', err);
     throw new ApolloError('Something went wrong', 'TRX_FAILED');

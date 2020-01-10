@@ -27,8 +27,15 @@ const offerRefund = async (user, amount, rzp, db, context) => {
   }
 };
 
+const refundUsers = async (users, amount, rzp, db, context) => {
+  for (let i = 0; i < users.length; i += 1) {
+    // eslint-disable-next-line no-await-in-loop
+    await offerRefund(users[i], amount, rzp, db, context);
+  }
+};
+
 // const offerRefund = (users, amount, rzp, db) => {
 //   users.forEach(user => refundUser(user, amount, rzp, db));
 // };
 
-module.exports = offerRefund;
+module.exports = refundUsers;
