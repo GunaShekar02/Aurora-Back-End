@@ -1,16 +1,20 @@
 const { UserInputError, ApolloError } = require('apollo-server-express');
 const bcrypt = require('bcrypt');
-
+const jwt = require('jsonwebtoken');
 const xss = require('xss');
+
+const { jwtSecret } = require('../../utils/config');
 const { generateArId } = require('../../utils/helpers');
-const getConfirmEmail = require('../../utils/emails/emailConfirm');
+const getAlphaEmail = require('../../utils/emails/emailAlpha');
 
 const mailer = require('../../utils/mailer');
 
-const signup = async (_, args, context) => {
+const alphaSignup = async (_, args, context) => {
   const { db, client, logger } = context;
   let email = args.email.toLowerCase();
-  const { password } = args;
+  const { passcode } = args;
+
+  if (passcode !== 'betagamma') throw new ApolloError('Go Home Kid.', 'GO_HOME_KID');
 
   const xssOptions = {
     whiteList: [],
@@ -24,15 +28,7 @@ const signup = async (_, args, context) => {
   const phone = xss(args.phone, xssOptions);
   const gender = xss(args.gender, xssOptions);
 
-  if (
-    name === '' ||
-    email === '' ||
-    college === '' ||
-    phone === '' ||
-    password === '' ||
-    gender === '' ||
-    city === ''
-  )
+  if (name === '' || email === '' || college === '' || phone === '' || gender === '' || city === '')
     throw new ApolloError('Required fields cannot be empty', 'FIELDS_REQUIRED');
 
   const user = await db.collection('users').findOne({ email });
@@ -47,17 +43,17 @@ const signup = async (_, args, context) => {
       gender,
       city,
       displayPic: `profile-${gender}.jpg`,
-      isVerified: false,
+      isVerified: true,
       accommodation: false,
       teams: [],
       teamInvitations: [],
       timeSt: `${Date.now()}`,
     };
-    const token = `${arId.replace(/-/g, '')}${Math.floor(Math.random() * 899999 + 100000)}`;
-    console.log(token);
+    const password = arId.replace(/-/g, '').toLowerCase();
+    console.log(password);
     const hash = await bcrypt.hash(password, 10);
 
-    const mailOptions = getConfirmEmail(name, email, token);
+    const mailOptions = getAlphaEmail(name, email, password);
     const session = client.startSession({
       defaultTransactionOptions: {
         readConcern: { level: 'local' },
@@ -69,20 +65,11 @@ const signup = async (_, args, context) => {
     try {
       await session.withTransaction(async () => {
         const usersCollection = db.collection('users');
-        const verifyCollection = db.collection('verify');
 
         await usersCollection.insertOne(
           {
             hash,
             ...payload,
-          },
-          { session }
-        );
-
-        await verifyCollection.insertOne(
-          {
-            _id: arId,
-            verifyHash: token,
           },
           { session }
         );
@@ -94,19 +81,21 @@ const signup = async (_, args, context) => {
       await session.endSession();
     }
 
-    await mailer(mailOptions);
-
-    return {
-      code: 200,
-      success: true,
-      message: `A verification email has been sent to ${email}, verify your email to continue. Didn't get the verification email? Please check your spam folder.`,
-      user: {
-        id: arId,
-        ...payload,
-      },
+    const jwtPayload = {
+      email,
+      id: arId,
     };
+
+    const token = jwt.sign(jwtPayload, jwtSecret.privKey, {
+      algorithm: 'ES512',
+      expiresIn: '30d',
+    });
+
+    mailer(mailOptions);
+
+    return token;
   }
   throw new UserInputError('Email already exists');
 };
 
-module.exports = signup;
+module.exports = alphaSignup;
