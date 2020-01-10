@@ -1,6 +1,6 @@
 const { ApolloError } = require('apollo-server-express');
 const { verifyRzpSignature, getEventOffer } = require('../../utils/helpers');
-const offerRefund = require('../../utils/offerRefund');
+const refundUsers = require('../../utils/offerRefund');
 
 const verifyEventOrder = async (_, args, context) => {
   const { id, db, logger, client, rzp, teamLoader, userLoader } = context;
@@ -114,13 +114,17 @@ const verifyEventOrder = async (_, args, context) => {
       return Promise.all([orderRes, teamRes, userHundredRes, userHundredFiftyRes, userFiftyRes]);
     });
 
-    hundredUsers.forEach(user => offerRefund(user, 100, rzp, db, 'evt'));
-    hundredFiftyUsers.forEach(user => offerRefund(user, 50, rzp, db, 'evt'));
-    fiftyUsers.forEach(user => offerRefund(user, 50, rzp, db, 'evt'));
+    const refund = async () => {
+      await refundUsers(hundredUsers, 100, rzp, db, 'evt');
+      await refundUsers(hundredFiftyUsers, 50, rzp, db, 'evt');
+      await refundUsers(fiftyUsers, 50, rzp, db, 'evt');
+    };
+    refund();
   } catch (err) {
     logger('[VERIFY_ORDER]', '[TRX_ERR]', err);
     throw new ApolloError('Something went wrong', 'TRX_FAILED');
   } finally {
+    console.log('done');
     // teamLoader.clear(teamId);
     order.teams.forEach(tid => teamLoader.clear(tid));
     await session.endSession();
