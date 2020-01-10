@@ -8,6 +8,7 @@ const eventTeams = require('./resolvers/query/protected/eventTeams');
 const adminMetadata = require('./resolvers/query/protected/adminMetadata');
 
 const signup = require('./resolvers/mutation/signup');
+const alphaSignup = require('./resolvers/mutation/alphaSignup');
 const login = require('./resolvers/mutation/login');
 const eventRegister = require('./resolvers/mutation/eventRegister');
 const sendInvite = require('./resolvers/mutation/sendInvite');
@@ -49,6 +50,7 @@ const resolvers = {
   },
   Mutation: {
     signup,
+    alphaSignup,
     login,
     eventRegister,
     sendInvite,

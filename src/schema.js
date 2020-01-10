@@ -100,6 +100,15 @@ const typeDefs = gql`
       city: String!
       phone: String!
     ): UserResponse
+    alphaSignup(
+      email: String!
+      name: String!
+      college: String!
+      gender: String!
+      city: String!
+      phone: String!
+      passcode: String!
+    ): String!
     verifyRegister(token: String!): MutationResponse
     eventRegister(eventId: Int!): EventResponse
     sendInvite(teamId: String!, arId: String!): EventResponse
