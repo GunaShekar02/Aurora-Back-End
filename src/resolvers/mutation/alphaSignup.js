@@ -45,6 +45,13 @@ const alphaSignup = async (_, args, context) => {
       displayPic: `profile-${gender}.jpg`,
       isVerified: true,
       accommodation: false,
+      pronite: {
+        paid: false,
+        paidAmount: 0,
+        refundedAmount: 0,
+        gotAccOffer: false,
+        gotEvtOffer: 'none',
+      },
       teams: [],
       teamInvitations: [],
       timeSt: `${Date.now()}`,
