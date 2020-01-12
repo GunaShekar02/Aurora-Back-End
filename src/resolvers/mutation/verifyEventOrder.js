@@ -1,6 +1,6 @@
 const { ApolloError } = require('apollo-server-express');
 const { verifyRzpSignature, getEventOffer } = require('../../utils/helpers');
-const refundUsers = require('../../utils/offerRefund');
+const { refundUsers } = require('../../utils/offerRefund');
 
 const verifyEventOrder = async (_, args, context) => {
   const { id, db, logger, client, rzp, teamLoader, userLoader } = context;

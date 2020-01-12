@@ -49,4 +49,4 @@ const refundUsers = async (users, amount, rzp, db, context) => {
   }
 };
 
-module.exports = refundUsers;
+module.exports = { refundUsers, offerRefund };
