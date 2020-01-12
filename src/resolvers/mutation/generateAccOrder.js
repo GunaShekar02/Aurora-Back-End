@@ -5,14 +5,15 @@ const { generateReceipt } = require('../../utils/helpers');
 const generateAccOrder = async (_, args, context) => {
   const { isValid, id, db, logger, userLoader, rzp } = context;
   const userIds = args.userIds.map(user => user.toUpperCase());
+  const uniqueUserIds = [...new Set(userIds)];
 
   if (isValid) {
-    if (!userIds.some(user => user === id))
+    if (!uniqueUserIds.includes(id))
       throw new ApolloError('User not it given user ids', 'USER_NOT_FOUND');
 
-    const users = await userLoader.loadMany(userIds);
+    const users = await userLoader.loadMany(uniqueUserIds);
 
-    if (users.some(user => user === null)) throw new ApolloError('Invalid User ID', 'INVALID_USER');
+    if (users.includes(null)) throw new ApolloError('Invalid User ID', 'INVALID_USER');
 
     if (users.some(user => user.accommodation === true))
       throw new ApolloError('Some user(s) already have accomodation', 'USR_HAVE_ACC');
@@ -34,7 +35,7 @@ const generateAccOrder = async (_, args, context) => {
         },
       });
 
-      logger('[ACC_ORDER]', 'order created by', id, 'for', userIds, 'orderId:', orderData.id);
+      logger('[ACC_ORDER]', 'order created by', id, 'for', uniqueUserIds, 'orderId:', orderData.id);
 
       try {
         await db.collection('accOrders').insertOne({
@@ -43,7 +44,7 @@ const generateAccOrder = async (_, args, context) => {
           signature: null,
           receipt,
           paidBy: id,
-          users: userIds,
+          users: uniqueUserIds,
           amount: totalAmount,
           finalAmount,
           status: 'initiated',

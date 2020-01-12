@@ -1,7 +1,9 @@
 const { ApolloError, AuthenticationError } = require('apollo-server-express');
+const eventMap = require('../../data/eventData');
+const { offerRefund } = require('../../utils/offerRefund');
 
 const acceptInvite = async (_, args, context) => {
-  const { isValid, db, client, id, userLoader, logger } = context;
+  const { isValid, db, client, id, userLoader, logger, rzp } = context;
 
   if (isValid) {
     const teamId = args.teamId.toUpperCase();
@@ -20,6 +22,30 @@ const acceptInvite = async (_, args, context) => {
       if (invite.eventId === team.event) invites.push(invite.teamId);
     });
 
+    let refundAmt = 0;
+    let evtOffer = 'hundred';
+    let gotRefund = false;
+    if (team.paymentStatus === true) {
+      const eventOffer = eventMap.get(team.event).hasOffer;
+      const { paid, gotAccOffer, gotEvtOffer } = user.pronite;
+
+      if (paid && !gotAccOffer && !(gotEvtOffer === 'hundred')) {
+        // we can give upto rs 100
+        if (eventOffer === 'hundred') {
+          if (gotEvtOffer === 'none') refundAmt = 100;
+          else if (gotEvtOffer === 'fifty') refundAmt = 50;
+        } // we can give upto rs 50
+        else if (eventOffer === 'fifty') {
+          if (gotEvtOffer === 'none') {
+            refundAmt = 50;
+            evtOffer = 'fifty';
+          } else if (gotEvtOffer === 'fifty') refundAmt = 50;
+        }
+        offerRefund(user, refundAmt, rzp, db, 'evt');
+        gotRefund = true;
+      }
+    }
+
     const session = client.startSession({
       defaultTransactionOptions: {
         readConcern: { level: 'local' },
@@ -33,14 +59,19 @@ const acceptInvite = async (_, args, context) => {
         const usersCollection = db.collection('users');
         const teamsCollection = db.collection('teams');
 
-        const userRes = usersCollection.updateOne(
-          { _id: id },
-          {
-            $push: { teams: { teamId, eventId: team.event } },
-            $pull: { teamInvitations: { eventId: team.event } },
-          },
-          { session }
-        );
+        const userObj = gotRefund
+          ? {
+              $push: { teams: { teamId, eventId: team.event } },
+              $pull: { teamInvitations: { eventId: team.event } },
+              $set: { 'pronite.gotEvtOffer': evtOffer },
+              $inc: { 'pronite.refundedAmount': refundAmt },
+            }
+          : {
+              $push: { teams: { teamId, eventId: team.event } },
+              $pull: { teamInvitations: { eventId: team.event } },
+            };
+
+        const userRes = usersCollection.updateOne({ _id: id }, userObj, { session });
         const teamRes = teamsCollection.updateOne(
           { _id: teamId },
           {

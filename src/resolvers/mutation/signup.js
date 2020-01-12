@@ -49,6 +49,13 @@ const signup = async (_, args, context) => {
       displayPic: `profile-${gender}.jpg`,
       isVerified: false,
       accommodation: false,
+      pronite: {
+        paid: false,
+        paidAmount: 0,
+        refundedAmount: 0,
+        gotAccOffer: false,
+        gotEvtOffer: 'none',
+      },
       teams: [],
       teamInvitations: [],
       timeSt: `${Date.now()}`,

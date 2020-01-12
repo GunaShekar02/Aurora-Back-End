@@ -2,7 +2,7 @@ const getForgotEmail = (name, email, resetHash) => {
   const uri = process.env.NODE_ENV === 'production' ? `` : `staging.`;
 
   const html = `<html lang="en">
-  <meta charset="UTF-8">
+  <head><meta charset="UTF-8"></head>
   <body style="font-family: Helvetica, serif;">
     <p>${name},</p>
     <p>Someone has requested a link to change your password. You can do this through the link below.</p>

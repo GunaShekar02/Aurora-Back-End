@@ -8,6 +8,7 @@ const data = [
       isNameRequired: false,
       maxSize: 15,
       parentEvent: 'parivesh',
+      hasOffer: 'hundred',
     },
   ],
   [
@@ -19,6 +20,7 @@ const data = [
       isNameRequired: true,
       maxSize: 10,
       parentEvent: 'corna',
+      hasOffer: 'hundred',
     },
   ],
   [
@@ -30,6 +32,7 @@ const data = [
       isNameRequired: false,
       maxSize: 1,
       parentEvent: 'mnm',
+      hasOffer: 'hundred',
     },
   ],
   [
@@ -41,6 +44,7 @@ const data = [
       isNameRequired: false,
       maxSize: 15,
       parentEvent: 'stepup',
+      hasOffer: 'fifty',
     },
   ],
   [
@@ -52,6 +56,7 @@ const data = [
       isNameRequired: false,
       maxSize: 2,
       parentEvent: 'stepup',
+      hasOffer: 'hundred',
     },
   ],
   [
@@ -63,6 +68,7 @@ const data = [
       isNameRequired: false,
       maxSize: 1,
       parentEvent: 'stepup',
+      hasOffer: 'hundred',
     },
   ],
   [
@@ -74,6 +80,7 @@ const data = [
       isNameRequired: false,
       maxSize: 4,
       parentEvent: 'eumelia',
+      hasOffer: 'fifty',
     },
   ],
   [
@@ -85,6 +92,7 @@ const data = [
       isNameRequired: false,
       maxSize: 2,
       parentEvent: 'eumelia',
+      hasOffer: 'hundred',
     },
   ],
   [
@@ -96,6 +104,7 @@ const data = [
       isNameRequired: false,
       maxSize: 4,
       parentEvent: 'eumelia',
+      hasOffer: 'fifty',
     },
   ],
   [
@@ -105,8 +114,9 @@ const data = [
       name: 'Graffathon',
       fee: 200,
       isNameRequired: false,
-      maxSize: 4,
+      maxSize: 1,
       parentEvent: 'le-arte-fiesta',
+      hasOffer: 'hundred',
     },
   ],
   [
@@ -118,6 +128,7 @@ const data = [
       isNameRequired: false,
       maxSize: 1,
       parentEvent: 'le-arte-fiesta',
+      hasOffer: 'hundred',
     },
   ],
   [
@@ -129,6 +140,7 @@ const data = [
       isNameRequired: false,
       maxSize: 1,
       parentEvent: 'le-arte-fiesta',
+      hasOffer: 'hundred',
     },
   ],
   [
@@ -140,6 +152,7 @@ const data = [
       isNameRequired: false,
       maxSize: 3,
       parentEvent: 'le-arte-fiesta',
+      hasOffer: false,
     },
   ],
   [
@@ -151,6 +164,7 @@ const data = [
       isNameRequired: false,
       maxSize: 2,
       parentEvent: 'le-arte-fiesta',
+      hasOffer: false,
     },
   ],
   [
@@ -162,6 +176,7 @@ const data = [
       isNameRequired: false,
       maxSize: 1,
       parentEvent: 'le-arte-fiesta',
+      hasOffer: false,
     },
   ],
   [
@@ -173,6 +188,7 @@ const data = [
       isNameRequired: false,
       maxSize: 4,
       parentEvent: 'pikture',
+      hasOffer: 'fifty',
     },
   ],
   [
@@ -184,6 +200,7 @@ const data = [
       isNameRequired: false,
       maxSize: 1,
       parentEvent: 'pikture',
+      hasOffer: false,
     },
   ],
   [
@@ -195,6 +212,7 @@ const data = [
       isNameRequired: false,
       maxSize: 2,
       parentEvent: 'pikture',
+      hasOffer: false,
     },
   ],
   [
@@ -206,6 +224,7 @@ const data = [
       isNameRequired: false,
       maxSize: 1,
       parentEvent: 'a-lit',
+      hasOffer: 'hundred',
     },
   ],
   [
@@ -217,6 +236,7 @@ const data = [
       isNameRequired: false,
       maxSize: 1,
       parentEvent: 'a-lit',
+      hasOffer: 'hundred',
     },
   ],
   [
@@ -228,6 +248,7 @@ const data = [
       isNameRequired: false,
       maxSize: 1,
       parentEvent: 'a-lit',
+      hasOffer: false,
     },
   ],
   [
@@ -239,6 +260,7 @@ const data = [
       isNameRequired: false,
       maxSize: 1,
       parentEvent: 'a-lit',
+      hasOffer: false,
     },
   ],
   [
@@ -250,6 +272,7 @@ const data = [
       isNameRequired: true,
       maxSize: 20,
       parentEvent: 'nukkad',
+      hasOffer: 'fifty',
     },
   ],
   [
@@ -261,6 +284,7 @@ const data = [
       isNameRequired: false,
       maxSize: 3,
       parentEvent: 'informal',
+      hasOffer: 'fifty',
     },
   ],
   [
@@ -272,6 +296,7 @@ const data = [
       isNameRequired: false,
       maxSize: 2,
       parentEvent: 'informal',
+      hasOffer: 'fifty',
     },
   ],
   [
@@ -283,6 +308,7 @@ const data = [
       isNameRequired: false,
       maxSize: 2,
       parentEvent: 'informal',
+      hasOffer: 'fifty',
     },
   ],
   [
@@ -294,6 +320,7 @@ const data = [
       isNameRequired: false,
       maxSize: 2,
       parentEvent: 'informal',
+      hasOffer: 'fifty',
     },
   ],
   [
@@ -305,6 +332,7 @@ const data = [
       isNameRequired: true,
       maxSize: 5,
       parentEvent: 'gamiacs',
+      hasOffer: 'fifty',
     },
   ],
   [
@@ -316,6 +344,7 @@ const data = [
       isNameRequired: true,
       maxSize: 4,
       parentEvent: 'gamiacs',
+      hasOffer: 'fifty',
     },
   ],
 ];

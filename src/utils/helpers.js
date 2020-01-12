@@ -1,5 +1,7 @@
 const crypto = require('crypto');
 const { rzpOptions } = require('./config');
+const eventMap = require('../data/eventData');
+const logger = require('./logger');
 
 const generateRandomNumber = () => {
   return Math.floor(Math.random() * 899 + 100);
@@ -62,4 +64,50 @@ const verifyRzpSignature = (orderId, paymentId, signature) => {
   return generatedSignature === signature;
 };
 
-module.exports = { generateArId, generateTeamId, generateReceipt, verifyRzpSignature };
+const isEligibleForEvtRefund = (user, teams) => {
+  if (user.pronite.gotAccOffer || user.pronite.gotEvtOffer === 'hundred') return 'none';
+
+  const paidTeams = teams.filter(team => team.paymentStatus);
+  logger('paidTeams=>', paidTeams);
+
+  const hasEligibleBigEvent = paidTeams.some(team => {
+    logger('checking bigEvt...', team.event);
+    return eventMap.get(team.event).hasOffer === 'hundred';
+  });
+  logger('hasEligibleBigEvent=>', hasEligibleBigEvent);
+
+  if (hasEligibleBigEvent) {
+    if (user.pronite.gotEvtOffer === 'none') return 'hundred';
+    return 'fifty';
+  }
+
+  const eligibleSmallEvent = paidTeams.filter(team => {
+    return eventMap.get(team.event).hasOffer === 'fifty';
+  });
+  const el = eligibleSmallEvent.length;
+  logger('eliSmallEvt=>', el);
+  if (el === 1) return 'fifty';
+  if (el >= 2) return 'hundred';
+
+  return 'none';
+};
+
+const getEventOffer = events => {
+  const hasEligibleBigEvent = events.some(evt => eventMap.get(evt).hasOffer === 'hundred');
+  if (hasEligibleBigEvent) return 'hundred';
+
+  const eligibleSmallEvent = events.filter(evt => eventMap.get(evt).hasOffer === 'fifty');
+  const el = eligibleSmallEvent.length;
+  if (el === 1) return 'fifty';
+  if (el >= 2) return 'hundred';
+  return 'none';
+};
+
+module.exports = {
+  generateArId,
+  generateTeamId,
+  generateReceipt,
+  verifyRzpSignature,
+  isEligibleForEvtRefund,
+  getEventOffer,
+};
