@@ -1,6 +1,6 @@
 const getAccRefundEmail = (name, email, amount) => {
   const html = `<html lang="en">
-  <meta charset="UTF-8">
+  <head><meta charset="UTF-8"></head>
   <body style="font-family: Helvetica, serif;">
     <p>${name},</p>
     <p>As you have availed accomodation during Aurora, and accomodation is bundled with pronite passes, we are issuing you a refund of Rs. ${amount}.</p>

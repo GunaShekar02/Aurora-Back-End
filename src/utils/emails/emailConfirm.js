@@ -2,7 +2,7 @@ const getConfirmEmail = (name, email, verificationHash) => {
   const uri = process.env.NODE_ENV === 'production' ? `` : `staging.`;
 
   const html = `<html lang="en">
-  <meta charset="UTF-8">
+  <head><meta charset="UTF-8"></head>
   <body>
     <table class="main-body" style="box-sizing: border-box; min-height: 150px; padding-top: 5px; padding-right: 5px; padding-bottom: 5px; padding-left: 5px; width: 100%; height: 100%; border-collapse: separate; background-color: rgb(216, 216, 216);" width="100%" height="100%" bgcolor="rgb(216, 216, 216)">
       <tbody style="box-sizing: border-box;">

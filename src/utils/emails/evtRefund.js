@@ -1,6 +1,6 @@
 const getEvtRefundEmail = (name, email, amount) => {
   const html = `<html lang="en">
-  <meta charset="UTF-8">
+  <head><meta charset="UTF-8"></head>
   <body style="font-family: Helvetica, serif;">
     <p>${name},</p>
     <p>As you have registered for an eligible event, we are issuing you a refund of Rs. ${amount}.</p>
