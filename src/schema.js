@@ -130,6 +130,7 @@ const typeDefs = gql`
     verifyProniteOrder(orderId: String!, paymentId: String!, signature: String!): UserResponse
     makeEventAdmin(arId: String!, eventIds: [Int!]!): MutationResponse
     impersonate(arId: String!): String!
+    updateProfile(name: String!, college: String!, city: String!, phone: String!): UserResponse
   }
 
   type EventResponse {
