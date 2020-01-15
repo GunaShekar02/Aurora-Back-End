@@ -131,6 +131,7 @@ const typeDefs = gql`
     makeEventAdmin(arId: String!, eventIds: [Int!]!): MutationResponse
     impersonate(arId: String!): String!
     updateProfile(name: String!, college: String!, city: String!, phone: String!): UserResponse
+    uploadPhoto(photo: Upload!): UserResponse
   }
 
   type EventResponse {
