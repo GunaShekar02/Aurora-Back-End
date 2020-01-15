@@ -23,6 +23,7 @@ const forgotPassword = require('./resolvers/mutation/forgotPassword');
 const resetPassword = require('./resolvers/mutation/resetPassword');
 const setTeamName = require('./resolvers/mutation/setTeamName');
 const updateProfile = require('./resolvers/mutation/updateProfile');
+const uploadPhoto = require('./resolvers/mutation/uploadPhoto');
 
 const generateEventOrder = require('./resolvers/mutation/generateEventOrder');
 const verifyEventOrder = require('./resolvers/mutation/verifyEventOrder');
@@ -74,6 +75,7 @@ const resolvers = {
     makeEventAdmin,
     impersonate,
     updateProfile,
+    uploadPhoto,
   },
   User,
   PublicUser,

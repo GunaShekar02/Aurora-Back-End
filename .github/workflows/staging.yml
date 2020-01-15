@@ -20,6 +20,7 @@ jobs:
           GPG_SECRET: ${{ secrets.GPG_SECRET }}
         run: |
           gpg --quiet --batch --yes --decrypt --passphrase="$GPG_SECRET" --output ./.env envstg.gpg
+          gpg --quiet --batch --yes --decrypt --passphrase="$GPG_SECRET" --output ./gcp-stg.json gcp-stg.json.gpg
 
       - name: Setup JWT keys
         env:
