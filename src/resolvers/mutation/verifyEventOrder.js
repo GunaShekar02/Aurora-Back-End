@@ -1,6 +1,9 @@
 const { ApolloError } = require('apollo-server-express');
 const { verifyRzpSignature, getEventOffer } = require('../../utils/helpers');
 const { refundUsers } = require('../../utils/offerRefund');
+const mailer = require('../../utils/mailer');
+const getEvtEmail = require('../../utils/emails/evtRegister');
+const eventMap = require('../../data/eventData');
 
 const verifyEventOrder = async (_, args, context) => {
   const { id, db, logger, client, rzp, teamLoader, userLoader } = context;
@@ -124,6 +127,13 @@ const verifyEventOrder = async (_, args, context) => {
     logger('[VERIFY_ORDER]', '[TRX_ERR]', err);
     throw new ApolloError('Something went wrong', 'TRX_FAILED');
   } finally {
+    users.forEach(user => {
+      const { name, email } = user;
+      userMap.get(user._id).forEach(eId => {
+        const { name: evtName, fee } = eventMap.get(eId);
+        mailer(getEvtEmail(name, email, evtName, order.receipt, fee));
+      });
+    });
     console.log('done');
     // teamLoader.clear(teamId);
     order.teams.forEach(tid => teamLoader.clear(tid));

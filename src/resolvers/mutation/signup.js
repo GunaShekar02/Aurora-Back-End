@@ -61,7 +61,6 @@ const signup = async (_, args, context) => {
       timeSt: `${Date.now()}`,
     };
     const token = `${arId.replace(/-/g, '')}${Math.floor(Math.random() * 899999 + 100000)}`;
-    console.log(token);
     const hash = await bcrypt.hash(password, 10);
 
     const mailOptions = getConfirmEmail(name, email, token);
