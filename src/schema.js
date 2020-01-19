@@ -29,6 +29,7 @@ const typeDefs = gql`
       sortDir: Int
       filterBy: String
       pattern: String
+      paymentStatus: Boolean
     ): TeamQueryRes
     adminMetadata: AdminRes
   }

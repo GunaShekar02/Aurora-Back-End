@@ -4,7 +4,7 @@ const eventTeams = async (_, args, context) => {
   const { isValid, isEventAdmin, isRoot, db, eventIds } = context;
 
   if (isValid && (isEventAdmin || isRoot)) {
-    const { filterBy, pattern } = args;
+    const { filterBy, pattern, paymentStatus } = args;
     const eventId = args.eventId || 1;
     const limit = args.limit || 9999999;
     const page = args.page || 0;
@@ -21,7 +21,7 @@ const eventTeams = async (_, args, context) => {
       ['teamId', '_id'],
     ]);
 
-    const filter = eventId === 0 ? {} : { event: eventId };
+    const filter = eventId === 0 ? { paymentStatus } : { event: eventId, paymentStatus };
     if (filterBy && pattern && availableFilters.has(filterBy)) {
       filter[availableFilters.get(filterBy)] = new RegExp(pattern, 'i');
     }
@@ -79,7 +79,7 @@ const eventTeams = async (_, args, context) => {
     });
 
     return {
-      total: total[0].teams,
+      total: total[0] ? total[0].teams : 0,
       teams,
     };
   }
