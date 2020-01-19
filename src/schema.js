@@ -73,6 +73,13 @@ const typeDefs = gql`
     teams: [Team!]
     teamInvitations: [TeamInvitation!]
     timeSt: String!
+    ca: CA!
+  }
+
+  type CA {
+    isCA: Boolean!
+    caId: String
+    users: [User!]
   }
 
   type PublicUser {
@@ -147,6 +154,7 @@ const typeDefs = gql`
     impersonate(arId: String!): String!
     updateProfile(name: String!, college: String!, city: String!, phone: String!): UserResponse
     uploadPhoto(photo: Upload!): UserResponse
+    setCA(id: String!): UserResponse
   }
 
   type EventResponse {

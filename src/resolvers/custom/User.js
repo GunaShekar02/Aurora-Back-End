@@ -73,6 +73,18 @@ const User = {
       };
     });
   },
+  ca: async (args, __, { userLoader }) => {
+    const { id } = args;
+    const user = await userLoader.load(id);
+    const { isCA, id: caId, users } = user.ca;
+    return {
+      isCA,
+      caId,
+      users: users.map(u => {
+        return { id: u };
+      }),
+    };
+  },
 };
 
 module.exports = User;
