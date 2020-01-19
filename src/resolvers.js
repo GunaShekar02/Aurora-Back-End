@@ -34,6 +34,7 @@ const generateProniteOrder = require('./resolvers/mutation/generateProniteOrder'
 const verifyProniteOrder = require('./resolvers/mutation/verifyProniteOrder');
 
 const makeEventAdmin = require('./resolvers/mutation/admin/makeEventAdmin');
+const makeCA = require('./resolvers/mutation/admin/makeCA');
 const impersonate = require('./resolvers/mutation/admin/impersonate');
 
 const User = require('./resolvers/custom/User');
@@ -73,11 +74,12 @@ const resolvers = {
     verifyAccOrder,
     generateProniteOrder,
     verifyProniteOrder,
-    makeEventAdmin,
-    impersonate,
     updateProfile,
     uploadPhoto,
     setCA,
+    makeEventAdmin,
+    makeCA,
+    impersonate,
   },
   User,
   PublicUser,
