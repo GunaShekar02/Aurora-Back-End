@@ -13,8 +13,23 @@ const typeDefs = gql`
       filterBy: String
       pattern: String
     ): UserQueryRes
-    allTeams(limit: Int, page: Int, sortBy: String, sortDir: Int): TeamQueryRes
-    eventTeams(eventId: Int, limit: Int, page: Int, sortBy: String, sortDir: Int): TeamQueryRes
+    allTeams(
+      limit: Int
+      page: Int
+      sortBy: String
+      sortDir: Int
+      filterBy: String
+      pattern: String
+    ): TeamQueryRes
+    eventTeams(
+      eventId: Int
+      limit: Int
+      page: Int
+      sortBy: String
+      sortDir: Int
+      filterBy: String
+      pattern: String
+    ): TeamQueryRes
     adminMetadata: AdminRes
   }
 
