@@ -24,6 +24,7 @@ const resetPassword = require('./resolvers/mutation/resetPassword');
 const setTeamName = require('./resolvers/mutation/setTeamName');
 const updateProfile = require('./resolvers/mutation/updateProfile');
 const uploadPhoto = require('./resolvers/mutation/uploadPhoto');
+const setCA = require('./resolvers/mutation/setCA');
 
 const generateEventOrder = require('./resolvers/mutation/generateEventOrder');
 const verifyEventOrder = require('./resolvers/mutation/verifyEventOrder');
@@ -33,6 +34,7 @@ const generateProniteOrder = require('./resolvers/mutation/generateProniteOrder'
 const verifyProniteOrder = require('./resolvers/mutation/verifyProniteOrder');
 
 const makeEventAdmin = require('./resolvers/mutation/admin/makeEventAdmin');
+const makeCA = require('./resolvers/mutation/admin/makeCA');
 const impersonate = require('./resolvers/mutation/admin/impersonate');
 
 const User = require('./resolvers/custom/User');
@@ -72,10 +74,12 @@ const resolvers = {
     verifyAccOrder,
     generateProniteOrder,
     verifyProniteOrder,
-    makeEventAdmin,
-    impersonate,
     updateProfile,
     uploadPhoto,
+    setCA,
+    makeEventAdmin,
+    makeCA,
+    impersonate,
   },
   User,
   PublicUser,

@@ -13,8 +13,24 @@ const typeDefs = gql`
       filterBy: String
       pattern: String
     ): UserQueryRes
-    allTeams(limit: Int, page: Int, sortBy: String, sortDir: Int): TeamQueryRes
-    eventTeams(eventId: Int, limit: Int, page: Int, sortBy: String, sortDir: Int): TeamQueryRes
+    allTeams(
+      limit: Int
+      page: Int
+      sortBy: String
+      sortDir: Int
+      filterBy: String
+      pattern: String
+    ): TeamQueryRes
+    eventTeams(
+      eventId: Int
+      limit: Int
+      page: Int
+      sortBy: String
+      sortDir: Int
+      filterBy: String
+      pattern: String
+      paymentStatus: Boolean
+    ): TeamQueryRes
     adminMetadata: AdminRes
   }
 
@@ -58,6 +74,13 @@ const typeDefs = gql`
     teams: [Team!]
     teamInvitations: [TeamInvitation!]
     timeSt: String!
+    ca: CA!
+  }
+
+  type CA {
+    isCA: Boolean!
+    caId: String
+    users: [User!]
   }
 
   type PublicUser {
@@ -129,9 +152,11 @@ const typeDefs = gql`
     generateProniteOrder(userIds: [String!]!): OrderResponse
     verifyProniteOrder(orderId: String!, paymentId: String!, signature: String!): UserResponse
     makeEventAdmin(arId: String!, eventIds: [Int!]!): MutationResponse
+    makeCA(arId: String!): MutationResponse
     impersonate(arId: String!): String!
     updateProfile(name: String!, college: String!, city: String!, phone: String!): UserResponse
     uploadPhoto(photo: Upload!): UserResponse
+    setCA(id: String!): UserResponse
   }
 
   type EventResponse {

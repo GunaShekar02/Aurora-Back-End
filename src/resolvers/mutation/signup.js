@@ -56,6 +56,11 @@ const signup = async (_, args, context) => {
         gotAccOffer: false,
         gotEvtOffer: 'none',
       },
+      ca: {
+        isCA: false,
+        id: null,
+        users: [],
+      },
       teams: [],
       teamInvitations: [],
       timeSt: `${Date.now()}`,

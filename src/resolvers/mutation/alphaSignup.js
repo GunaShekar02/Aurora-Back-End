@@ -52,12 +52,16 @@ const alphaSignup = async (_, args, context) => {
         gotAccOffer: false,
         gotEvtOffer: 'none',
       },
+      ca: {
+        isCA: false,
+        id: null,
+        users: [],
+      },
       teams: [],
       teamInvitations: [],
       timeSt: `${Date.now()}`,
     };
     const password = arId.replace(/-/g, '').toLowerCase();
-    console.log(password);
     const hash = await bcrypt.hash(password, 10);
 
     const mailOptions = getAlphaEmail(name, email, password);

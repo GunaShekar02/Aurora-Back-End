@@ -46,7 +46,7 @@ const uploadPhoto = async (_, args, context) => {
           },
         })
       );
-      myBucket.file(user.displayPic).delete();
+      if (!user.displayPic.startsWith('profile')) myBucket.file(user.displayPic).delete();
     } catch (err) {
       logger('[UP_ERR]', err);
       throw new ApolloError('File upload failed', 'UPLOAD_FAILED');

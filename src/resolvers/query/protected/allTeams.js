@@ -4,22 +4,57 @@ const allTeams = async (_, args, context) => {
   const { isValid, isRoot, db } = context;
 
   if (isValid && isRoot) {
+    const { filterBy, pattern } = args;
     const limit = args.limit || 0;
     const page = args.page || 0;
     const sortBy = args.sortBy || 'none'; // dummy field
     const sortDir = args.sortDir || -1;
 
-    const total = await db.collection('teams').count();
+    const availableFilters = new Map([
+      ['member', 'members'],
+      ['teamId', '_id'],
+      ['eventId', 'event'],
+    ]);
 
-    const cursor = await db
+    const filter = {};
+    if (filterBy && pattern && availableFilters.has(filterBy)) {
+      filter[availableFilters.get(filterBy)] = new RegExp(pattern, 'i');
+    }
+
+    const total = await db
       .collection('teams')
-      .find({})
-      .sort([[sortBy, sortDir]])
-      .project({ _id: 1 });
+      .aggregate([
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'members',
+            foreignField: '_id',
+            as: 'memberList',
+          },
+        },
+        { $match: filter },
+        {
+          $count: 'teams',
+        },
+      ])
+      .toArray();
 
-    const teamRes = await cursor
-      .skip(page * limit)
-      .limit(limit)
+    const teamRes = await db
+      .collection('teams')
+      .aggregate([
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'members',
+            foreignField: '_id',
+            as: 'memberList',
+          },
+        },
+        { $match: filter },
+        { $sort: { [sortBy]: sortDir } },
+        { $skip: page * limit },
+        { $limit: limit },
+      ])
       .toArray();
 
     const teams = teamRes.map(team => {
@@ -29,7 +64,7 @@ const allTeams = async (_, args, context) => {
     });
 
     return {
-      total,
+      total: total[0].teams,
       teams,
     };
   }
