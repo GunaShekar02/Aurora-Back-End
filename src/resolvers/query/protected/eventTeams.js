@@ -5,7 +5,7 @@ const eventTeams = async (_, args, context) => {
 
   if (isValid && (isEventAdmin || isRoot)) {
     const { filterBy, pattern, paymentStatus } = args;
-    const eventId = args.eventId || 1;
+    const eventId = args.eventId || 0;
     const limit = args.limit || 9999999;
     const page = args.page || 0;
     const sortBy = args.sortBy || 'none'; // dummy field
