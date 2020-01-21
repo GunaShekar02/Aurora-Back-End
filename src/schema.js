@@ -222,6 +222,9 @@ const typeDefs = gql`
     makeEventAdmin(arId: String!, eventIds: [Int!]!): MutationResponse
     makeCA(arId: String!): MutationResponse
     impersonate(arId: String!): String!
+    reVerifyEvtOrder(orderId: String!): MutationResponse
+    reVerifyAccOrder(orderId: String!): MutationResponse
+    reVerifyProniteOrder(orderId: String!): MutationResponse
     updateProfile(name: String!, college: String!, city: String!, phone: String!): UserResponse
     uploadPhoto(photo: Upload!): UserResponse
     setCA(id: String!): UserResponse
