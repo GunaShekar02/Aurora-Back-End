@@ -1,9 +1,10 @@
 const { AuthenticationError } = require('apollo-server-express');
+const { canViewUsers } = require('../../../utils/roles');
 
 const allUsers = async (_, args, context) => {
-  const { isValid, isRoot, db } = context;
+  const { id, userLoader, isValid, db } = context;
 
-  if (isValid && isRoot) {
+  if (isValid && (await canViewUsers(id, userLoader))) {
     const { filterBy, pattern } = args;
     const limit = args.limit || 0;
     const page = args.page || 0;

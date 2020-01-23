@@ -2,11 +2,14 @@ const { AuthenticationError, ApolloError } = require('apollo-server-express');
 const jwt = require('jsonwebtoken');
 
 const { jwtSecret } = require('../../../utils/config');
+const { canEditUsers } = require('../../../utils/roles');
 
 const makeEventAdmin = async (_, args, context) => {
-  const { isValid, isRoot, userLoader } = context;
+  const { id, isValid, userLoader } = context;
 
-  if (isValid && isRoot) {
+  const auth = await canEditUsers(id, userLoader);
+
+  if (isValid && auth) {
     const arId = args.arId.toUpperCase();
 
     const user = await userLoader.load(arId);

@@ -81,8 +81,18 @@ const typeDefs = gql`
   }
 
   type AdminRes {
-    isRoot: Boolean!
-    isEventAdmin: Boolean!
+    roles: [String!]
+    canViewUsers: Boolean
+    canEditUsers: Boolean
+    canViewEvents: Boolean
+    canViewOrders: Boolean
+    canEditOrders: Boolean
+    canViewAcc: Boolean
+    canEditAcc: Boolean
+    canViewPronites: Boolean
+    canEditPronites: Boolean
+    canViewCA: Boolean
+    canEditCA: Boolean
     events: [Event!]
   }
 

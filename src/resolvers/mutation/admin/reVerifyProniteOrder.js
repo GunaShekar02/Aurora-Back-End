@@ -2,11 +2,12 @@ const { AuthenticationError, ApolloError } = require('apollo-server-express');
 const { isEligibleForEvtRefund } = require('../../../utils/helpers');
 const mailer = require('../../../utils/mailer');
 const getProniteEmail = require('../../../utils/emails/pronite');
+const { canEditPronites } = require('../../../utils/roles');
 
 const reVerifyEvtOrder = async (_, args, context) => {
-  const { isValid, isRoot, db, rzp, client, userLoader, teamLoader, logger } = context;
+  const { isValid, id, db, rzp, client, userLoader, teamLoader, logger } = context;
 
-  if (isValid && isRoot) {
+  if (isValid && (await canEditPronites(id, userLoader))) {
     const { orderId } = args;
 
     const orderCollection = db.collection('proniteOrders');

@@ -4,11 +4,12 @@ const { refundUsers } = require('../../../utils/offerRefund');
 const mailer = require('../../../utils/mailer');
 const getEvtEmail = require('../../../utils/emails/evtRegister');
 const eventMap = require('../../../data/eventData');
+const { canEditOrders } = require('../../../utils/roles');
 
 const reVerifyEvtOrder = async (_, args, context) => {
-  const { isValid, isRoot, db, rzp, client, userLoader, teamLoader, logger } = context;
+  const { isValid, id, db, rzp, client, userLoader, teamLoader, logger } = context;
 
-  if (isValid && isRoot) {
+  if (isValid && (await canEditOrders(id, userLoader))) {
     const { orderId } = args;
 
     const orderCollection = db.collection('orders');

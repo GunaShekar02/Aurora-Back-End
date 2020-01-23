@@ -1,9 +1,10 @@
 const { AuthenticationError, ApolloError } = require('apollo-server-express');
+const { canViewEvents, canViewAllEvents } = require('../../../utils/roles');
 
 const eventTeams = async (_, args, context) => {
-  const { isValid, isEventAdmin, isRoot, db, eventIds } = context;
+  const { isValid, id, userLoader, db } = context;
 
-  if (isValid && (isEventAdmin || isRoot)) {
+  if (isValid && (await canViewEvents(id, userLoader))) {
     const { filterBy, pattern, paymentStatus } = args;
     const eventId = args.eventId || 0;
     const limit = args.limit || 9999999;
@@ -11,7 +12,11 @@ const eventTeams = async (_, args, context) => {
     const sortBy = args.sortBy || 'none'; // dummy field
     const sortDir = args.sortDir || -1;
 
-    if (!(isRoot || eventIds.some(eId => eId === eventId)))
+    const user = await userLoader.load(id);
+
+    if (
+      !((await canViewAllEvents(id, userLoader)) || user.role.events.some(eId => eId === eventId))
+    )
       throw new ApolloError('Invalid eventId', 'INVALID_EVENTID');
 
     const availableFilters = new Map([

@@ -2,11 +2,12 @@ const { AuthenticationError, ApolloError } = require('apollo-server-express');
 const { refundUsers } = require('../../../utils/offerRefund');
 const mailer = require('../../../utils/mailer');
 const getAccEmail = require('../../../utils/emails/accomodation');
+const { canEditAcc } = require('../../../utils/roles');
 
 const reVerifyAccOrder = async (_, args, context) => {
-  const { isValid, isRoot, db, rzp, client, userLoader, logger } = context;
+  const { isValid, id, db, rzp, client, userLoader, logger } = context;
 
-  if (isValid && isRoot) {
+  if (isValid && (await canEditAcc(id, userLoader))) {
     const { orderId } = args;
 
     const orderCollection = db.collection('accOrders');
