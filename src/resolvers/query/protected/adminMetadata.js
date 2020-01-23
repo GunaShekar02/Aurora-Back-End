@@ -19,10 +19,13 @@ const {
 } = require('../../../utils/roles');
 
 const adminMetadata = async (_, __, context) => {
-  const { id, isValid, userLoader, eventIds } = context;
+  const { id, isValid, userLoader } = context;
   const roles = await getRoles(id, userLoader);
 
   if (isValid && roles.length) {
+    const {
+      role: { events: eventIds },
+    } = await userLoader.load(id);
     let events = [];
 
     if (await canViewAllEvents(id, userLoader)) {
