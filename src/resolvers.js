@@ -5,7 +5,11 @@ const publicUsers = require('./resolvers/query/publicUsers');
 const allUsers = require('./resolvers/query/protected/allUsers');
 const allTeams = require('./resolvers/query/protected/allTeams');
 const eventTeams = require('./resolvers/query/protected/eventTeams');
+const eventOrders = require('./resolvers/query/protected/eventOrders');
+const proniteOrders = require('./resolvers/query/protected/proniteOrders');
+const accOrders = require('./resolvers/query/protected/accOrders');
 const adminMetadata = require('./resolvers/query/protected/adminMetadata');
+const stats = require('./resolvers/query/protected/stats');
 
 const signup = require('./resolvers/mutation/signup');
 const alphaSignup = require('./resolvers/mutation/alphaSignup');
@@ -36,10 +40,14 @@ const verifyProniteOrder = require('./resolvers/mutation/verifyProniteOrder');
 const makeEventAdmin = require('./resolvers/mutation/admin/makeEventAdmin');
 const makeCA = require('./resolvers/mutation/admin/makeCA');
 const impersonate = require('./resolvers/mutation/admin/impersonate');
+const reVerifyEvtOrder = require('./resolvers/mutation/admin/reVerifyEvtOrder');
+const reVerifyProniteOrder = require('./resolvers/mutation/admin/reVerifyProniteOrder');
+const reVerifyAccOrder = require('./resolvers/mutation/admin/reVerifyAccOrder');
 
 const User = require('./resolvers/custom/User');
 const PublicUser = require('./resolvers/custom/PublicUser');
 const Team = require('./resolvers/custom/Team');
+const NullTeam = require('./resolvers/custom/NullTeam');
 const Event = require('./resolvers/custom/Event');
 
 const resolvers = {
@@ -50,7 +58,11 @@ const resolvers = {
     allUsers,
     allTeams,
     eventTeams,
+    eventOrders,
+    proniteOrders,
+    accOrders,
     adminMetadata,
+    stats,
   },
   Mutation: {
     signup,
@@ -80,10 +92,14 @@ const resolvers = {
     makeEventAdmin,
     makeCA,
     impersonate,
+    reVerifyEvtOrder,
+    reVerifyProniteOrder,
+    reVerifyAccOrder,
   },
   User,
   PublicUser,
   Team,
+  NullTeam,
   PrivateTeam: Team,
   Event,
 };

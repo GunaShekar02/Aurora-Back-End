@@ -31,7 +31,35 @@ const typeDefs = gql`
       pattern: String
       paymentStatus: Boolean
     ): TeamQueryRes
+    eventOrders(
+      limit: Int
+      page: Int
+      sortBy: String
+      sortDir: Int
+      filterBy: String
+      pattern: String
+      status: String
+    ): EventOrderRes
+    proniteOrders(
+      limit: Int
+      page: Int
+      sortBy: String
+      sortDir: Int
+      filterBy: String
+      pattern: String
+      status: String
+    ): OrderRes
+    accOrders(
+      limit: Int
+      page: Int
+      sortBy: String
+      sortDir: Int
+      filterBy: String
+      pattern: String
+      status: String
+    ): OrderRes
     adminMetadata: AdminRes
+    stats: StatRes
   }
 
   type UserQueryRes {
@@ -44,10 +72,62 @@ const typeDefs = gql`
     teams: [PrivateTeam!]
   }
 
+  type EventOrderRes {
+    total: Int!
+    orders: [EvtOrder!]
+  }
+  type OrderRes {
+    total: Int!
+    orders: [Order!]
+  }
+
   type AdminRes {
-    isRoot: Boolean!
-    isEventAdmin: Boolean!
+    roles: [String!]
+    canViewUsers: Boolean
+    canEditUsers: Boolean
+    canViewEvents: Boolean
+    canViewOrders: Boolean
+    canEditOrders: Boolean
+    canViewAcc: Boolean
+    canEditAcc: Boolean
+    canViewPronites: Boolean
+    canEditPronites: Boolean
+    canViewCA: Boolean
+    canEditCA: Boolean
     events: [Event!]
+  }
+
+  type StatRes {
+    total: Int
+    verified: Int
+    pronite: Int
+    accommodation: Int
+    events: Int
+    onsiteEvents: Int
+  }
+
+  type EvtOrder {
+    orderId: String!
+    paymentId: String
+    receipt: String!
+    paidBy: User!
+    teams: [NullTeam!]
+    amount: Int!
+    finalAmount: Int!
+    status: String!
+    timeSt: Int!
+  }
+
+  type Order {
+    orderId: String!
+    paymentId: String
+    receipt: String!
+    paidBy: User!
+    users: [User!]
+    amount: Int!
+    finalAmount: Int!
+    status: String!
+    timeSt: Int!
   }
 
   type Event {
@@ -96,6 +176,14 @@ const typeDefs = gql`
     members: [PublicUser!]!
     paymentStatus: Boolean!
     pendingInvitations: [PublicUser!]
+  }
+  type NullTeam {
+    id: String!
+    name: String
+    event: Event
+    members: [PublicUser]
+    paymentStatus: Boolean
+    pendingInvitations: [PublicUser]
   }
 
   type PrivateTeam {
@@ -154,6 +242,9 @@ const typeDefs = gql`
     makeEventAdmin(arId: String!, eventIds: [Int!]!): MutationResponse
     makeCA(arId: String!): MutationResponse
     impersonate(arId: String!): String!
+    reVerifyEvtOrder(orderId: String!): MutationResponse
+    reVerifyAccOrder(orderId: String!): MutationResponse
+    reVerifyProniteOrder(orderId: String!): MutationResponse
     updateProfile(name: String!, college: String!, city: String!, phone: String!): UserResponse
     uploadPhoto(photo: Upload!): UserResponse
     setCA(id: String!): UserResponse
