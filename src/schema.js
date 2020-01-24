@@ -59,6 +59,7 @@ const typeDefs = gql`
       status: String
     ): OrderRes
     adminMetadata: AdminRes
+    stats: StatRes
   }
 
   type UserQueryRes {
@@ -94,6 +95,15 @@ const typeDefs = gql`
     canViewCA: Boolean
     canEditCA: Boolean
     events: [Event!]
+  }
+
+  type StatRes {
+    total: Int
+    verified: Int
+    pronite: Int
+    accommodation: Int
+    events: Int
+    onsiteEvents: Int
   }
 
   type EvtOrder {
