@@ -1,16 +1,36 @@
 const { AuthenticationError } = require('apollo-server-express');
 
 const eventData = require('../../../data/eventData');
+const {
+  getRoles,
+  canViewUsers,
+  canEditUsers,
+  canViewAllEvents,
+  canViewSomeEvents,
+  canViewEvents,
+  canViewOrders,
+  canEditOrders,
+  canViewAcc,
+  canEditAcc,
+  canViewPronites,
+  canEditPronites,
+  canViewCA,
+  canEditCA,
+} = require('../../../utils/roles');
 
 const adminMetadata = async (_, __, context) => {
-  const { isValid, isEventAdmin, isRoot, eventIds } = context;
+  const { id, isValid, userLoader } = context;
+  const roles = await getRoles(id, userLoader);
 
-  if (isValid && (isEventAdmin || isRoot)) {
-    let events;
+  if (isValid && roles.length) {
+    const {
+      role: { events: eventIds },
+    } = await userLoader.load(id);
+    let events = [];
 
-    if (isRoot) {
+    if (await canViewAllEvents(id, userLoader)) {
       events = Array.from(eventData.values());
-    } else {
+    } else if (await canViewSomeEvents(id, userLoader)) {
       events = eventIds.map(evtId => {
         return {
           id: evtId,
@@ -19,8 +39,18 @@ const adminMetadata = async (_, __, context) => {
     }
 
     return {
-      isRoot,
-      isEventAdmin,
+      roles,
+      canViewUsers: await canViewUsers(id, userLoader),
+      canEditUsers: await canEditUsers(id, userLoader),
+      canViewEvents: await canViewEvents(id, userLoader),
+      canViewOrders: await canViewOrders(id, userLoader),
+      canEditOrders: await canEditOrders(id, userLoader),
+      canViewAcc: await canViewAcc(id, userLoader),
+      canEditAcc: await canEditAcc(id, userLoader),
+      canViewPronites: await canViewPronites(id, userLoader),
+      canEditPronites: await canEditPronites(id, userLoader),
+      canViewCA: await canViewCA(id, userLoader),
+      canEditCA: await canEditCA(id, userLoader),
       events,
     };
   }

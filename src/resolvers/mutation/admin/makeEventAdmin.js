@@ -1,9 +1,10 @@
 const { AuthenticationError, ApolloError } = require('apollo-server-express');
+const { canEditUsers } = require('../../../utils/roles');
 
 const makeEventAdmin = async (_, args, context) => {
-  const { isValid, isRoot, userLoader, db } = context;
+  const { isValid, id, userLoader, db } = context;
 
-  if (isValid && isRoot) {
+  if (isValid && (await canEditUsers(id, userLoader))) {
     const arId = args.arId.toUpperCase();
     const { eventIds } = args;
 

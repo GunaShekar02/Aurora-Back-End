@@ -1,9 +1,10 @@
 const { AuthenticationError, ApolloError } = require('apollo-server-express');
+const { canEditCA, canEditUsers } = require('../../../utils/roles');
 
 const makeCA = async (_, args, context) => {
-  const { isValid, isRoot, userLoader, db } = context;
+  const { isValid, id, userLoader, db } = context;
 
-  if (isValid && isRoot) {
+  if (isValid && ((await canEditCA(id, userLoader)) || (await canEditUsers(id, userLoader)))) {
     const arId = args.arId.toUpperCase();
 
     const user = await userLoader.load(arId);

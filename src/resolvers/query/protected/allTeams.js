@@ -1,9 +1,10 @@
 const { AuthenticationError } = require('apollo-server-express');
+const { canViewAllEvents } = require('../../../utils/roles');
 
 const allTeams = async (_, args, context) => {
-  const { isValid, isRoot, db } = context;
+  const { isValid, db, id, userLoader } = context;
 
-  if (isValid && isRoot) {
+  if (isValid && (await canViewAllEvents(id, userLoader))) {
     const { filterBy, pattern } = args;
     const limit = args.limit || 0;
     const page = args.page || 0;
