@@ -3,6 +3,7 @@ const { verifyRzpSignature } = require('../../utils/helpers');
 const { refundUsers } = require('../../utils/offerRefund');
 const mailer = require('../../utils/mailer');
 const getAccEmail = require('../../utils/emails/accomodation');
+const getInfoAccEmail = require('../../utils/emails/infoAcc');
 
 const verifyAccOrder = async (_, args, context) => {
   const { id, db, logger, client, rzp, userLoader } = context;
@@ -95,7 +96,10 @@ const verifyAccOrder = async (_, args, context) => {
     };
     refund();
 
-    users.forEach(u => mailer(getAccEmail(u.name, u.email, u._id, order.receipt, 799)));
+    users.forEach(u => {
+      mailer(getAccEmail(u.name, u.email, u._id, order.receipt, 799));
+      mailer(getInfoAccEmail(u._id, u.name, u.email, orderId, 799));
+    });
   } catch (err) {
     logger('[VERIFY_ORDER]', '[TRX_ERR]', err);
     throw new ApolloError('Something went wrong', 'TRX_FAILED');

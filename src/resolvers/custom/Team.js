@@ -28,6 +28,11 @@ const Team = {
     const team = await teamLoader.load(teamId);
     return team.paymentStatus;
   },
+
+  timeSt: async ({ teamId }, __, { teamLoader }) => {
+    const team = await teamLoader.load(teamId);
+    return team.timeSt;
+  },
 };
 
 module.exports = Team;

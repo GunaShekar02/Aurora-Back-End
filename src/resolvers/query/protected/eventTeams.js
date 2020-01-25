@@ -9,7 +9,7 @@ const eventTeams = async (_, args, context) => {
     const eventId = args.eventId || 0;
     const limit = args.limit || 9999999;
     const page = args.page || 0;
-    const sortBy = args.sortBy || 'none'; // dummy field
+    const sortBy = args.sortBy || 'timeSt';
     const sortDir = args.sortDir || -1;
 
     const user = await userLoader.load(id);
@@ -59,6 +59,8 @@ const eventTeams = async (_, args, context) => {
     //   .skip(page * limit)
     //   .limit(limit)
     //   .toArray();
+    const skip = page * limit;
+    console.log('skippin', skip);
     const teamRes = await db
       .collection('teams')
       .aggregate([
@@ -72,7 +74,7 @@ const eventTeams = async (_, args, context) => {
         },
         { $match: filter },
         { $sort: { [sortBy]: sortDir } },
-        { $skip: page * limit },
+        { $skip: skip },
         { $limit: limit },
       ])
       .toArray();

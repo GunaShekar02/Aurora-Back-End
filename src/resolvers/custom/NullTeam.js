@@ -34,6 +34,12 @@ const NullTeam = {
     if (team) return team.paymentStatus;
     return null;
   },
+
+  timeSt: async ({ teamId }, __, { teamLoader }) => {
+    const team = await teamLoader.load(teamId);
+    if (team) return team.timeSt;
+    return null;
+  },
 };
 
 module.exports = NullTeam;
