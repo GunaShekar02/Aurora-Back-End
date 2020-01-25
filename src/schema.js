@@ -176,6 +176,7 @@ const typeDefs = gql`
     members: [PublicUser!]!
     paymentStatus: Boolean!
     pendingInvitations: [PublicUser!]
+    timeSt: String!
   }
   type NullTeam {
     id: String!
@@ -184,6 +185,7 @@ const typeDefs = gql`
     members: [PublicUser]
     paymentStatus: Boolean
     pendingInvitations: [PublicUser]
+    timeSt: String
   }
 
   type PrivateTeam {
@@ -193,6 +195,7 @@ const typeDefs = gql`
     members: [User!]!
     paymentStatus: Boolean!
     pendingInvitations: [User!]
+    timeSt: String!
   }
 
   type TeamInvitation {

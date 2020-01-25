@@ -51,6 +51,7 @@ const eventRegister = async (_, args, context) => {
               members: [userId],
               paymentStatus: false,
               pendingInvitations: [],
+              timeSt: `${Date.now()}`,
             },
             { session }
           );
