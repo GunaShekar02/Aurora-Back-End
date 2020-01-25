@@ -2,6 +2,7 @@ const { ApolloError } = require('apollo-server-express');
 const { verifyRzpSignature, isEligibleForEvtRefund } = require('../../utils/helpers');
 const mailer = require('../../utils/mailer');
 const getProniteEmail = require('../../utils/emails/pronite');
+const getInfoProEmail = require('../../utils/emails/infoPronite');
 
 const verifyProniteOrder = async (_, args, context) => {
   const { id, db, logger, client, rzp, userLoader, teamLoader } = context;
@@ -94,15 +95,18 @@ const verifyProniteOrder = async (_, args, context) => {
       return Promise.all([orderRes, userRes, userSmallEvtRes, userEvtRes]);
     });
 
-    notEligibleUsers.forEach(u =>
-      mailer(getProniteEmail(u.name, u.email, u._id, order.receipt, 349))
-    );
-    smallOfferEligibleUsers.forEach(u =>
-      mailer(getProniteEmail(u.name, u.email, u._id, order.receipt, 299))
-    );
-    offerEligibleUsers.forEach(u =>
-      mailer(getProniteEmail(u.name, u.email, u._id, order.receipt, 249))
-    );
+    notEligibleUsers.forEach(u => {
+      mailer(getProniteEmail(u.name, u.email, u._id, order.receipt, 349));
+      mailer(getInfoProEmail(u._id, u.name, u.email, orderId, 349));
+    });
+    smallOfferEligibleUsers.forEach(u => {
+      mailer(getProniteEmail(u.name, u.email, u._id, order.receipt, 299));
+      mailer(getInfoProEmail(u._id, u.name, u.email, orderId, 299));
+    });
+    offerEligibleUsers.forEach(u => {
+      mailer(getProniteEmail(u.name, u.email, u._id, order.receipt, 249));
+      mailer(getInfoProEmail(u._id, u.name, u.email, orderId, 249));
+    });
   } catch (err) {
     logger('[VERIFY_ORDER]', '[TRX_ERR]', err);
     throw new ApolloError('Something went wrong', 'TRX_FAILED');
