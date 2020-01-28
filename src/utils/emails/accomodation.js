@@ -5,7 +5,7 @@ const getAccEmail = (name, email, arId, receipt, amount) => {
   </head>
   <body style="font-family: Helvetica, serif;">
     <p>${name},</p>
-    <p>You have succesfully booked accomodation for Aurora'20. Also, accomodation at Aurora 20 comes bundled with pronite passes.</p>
+    <p>You have successfully booked accomodation for Aurora'20. Also, accomodation at Aurora 20 comes bundled with pronite passes.</p>
     <p>
       <b>Order Summery:</b><br />
       <table style="width: 90%; margin-left: 5%; border: 1px solid black; border-collapse: collapse; text-align: center;">
@@ -37,7 +37,7 @@ const getAccEmail = (name, email, arId, receipt, amount) => {
   const text = `
 ${name},
 
-You have succesfully availed the Pronite pass(es) for Aurora'20.
+You have successfully availed the Pronite pass(es) for Aurora'20.
 
 Order summary:
 AR-ID    - Amount - Receipt ID

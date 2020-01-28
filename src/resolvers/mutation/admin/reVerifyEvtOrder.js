@@ -3,6 +3,7 @@ const { getEventOffer } = require('../../../utils/helpers');
 const { refundUsers } = require('../../../utils/offerRefund');
 const mailer = require('../../../utils/mailer');
 const getEvtEmail = require('../../../utils/emails/evtRegister');
+const getInfoEvtEmail = require('../../../utils/emails/infoEvt');
 const eventMap = require('../../../data/eventData');
 const { canEditOrders } = require('../../../utils/roles');
 
@@ -140,6 +141,12 @@ const reVerifyEvtOrder = async (_, args, context) => {
       logger('[VERIFY_ORDER]', '[TRX_ERR]', err);
       throw new ApolloError('Something went wrong', 'TRX_FAILED');
     } finally {
+      const payUser = await userLoader.load(id);
+      teams.forEach(t => {
+        const { name, fee } = eventMap.get(t.event);
+        mailer(getInfoEvtEmail(id, payUser.name, payUser.email, name, fee, t._id));
+      });
+
       users.forEach(user => {
         const { name, email } = user;
         userMap.get(user._id).forEach(eId => {
