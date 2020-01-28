@@ -23,15 +23,13 @@ const adminMetadata = async (_, __, context) => {
   const roles = await getRoles(id, userLoader);
 
   if (isValid && roles.length) {
-    const {
-      role: { events: eventIds },
-    } = await userLoader.load(id);
+    const user = await userLoader.load(id);
     let events = [];
 
     if (await canViewAllEvents(id, userLoader)) {
       events = Array.from(eventData.values());
-    } else if (await canViewSomeEvents(id, userLoader)) {
-      events = eventIds.map(evtId => {
+    } else if (user.role && user.role.events && (await canViewSomeEvents(id, userLoader))) {
+      events = user.role.events.map(evtId => {
         return {
           id: evtId,
         };
