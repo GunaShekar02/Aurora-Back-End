@@ -1,7 +1,8 @@
 const NullTeam = {
   name: async ({ teamId }, __, { teamLoader }) => {
     const team = await teamLoader.load(teamId);
-    return team.name;
+    if (team) return team.name;
+    return null;
   },
 
   id: async ({ teamId }) => teamId,

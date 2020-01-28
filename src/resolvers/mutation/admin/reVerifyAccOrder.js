@@ -2,6 +2,7 @@ const { AuthenticationError, ApolloError } = require('apollo-server-express');
 const { refundUsers } = require('../../../utils/offerRefund');
 const mailer = require('../../../utils/mailer');
 const getAccEmail = require('../../../utils/emails/accomodation');
+const getInfoAccEmail = require('../../../utils/emails/infoAcc');
 const { canEditAcc } = require('../../../utils/roles');
 
 const reVerifyAccOrder = async (_, args, context) => {
@@ -107,7 +108,10 @@ const reVerifyAccOrder = async (_, args, context) => {
       };
       refund();
 
-      users.forEach(u => mailer(getAccEmail(u.name, u.email, u._id, order.receipt, 799)));
+      users.forEach(u => {
+        mailer(getAccEmail(u.name, u.email, u._id, order.receipt, 799));
+        mailer(getInfoAccEmail(u._id, u.name, u.email, orderId, 799));
+      });
     } catch (err) {
       logger('[VERIFY_ORDER]', '[TRX_ERR]', err);
       throw new ApolloError('Something went wrong', 'TRX_FAILED');

@@ -5,7 +5,7 @@ const getEvtEmail = (name, email, event, receipt, amount) => {
   </head>
   <body style="font-family: Helvetica, serif;">
     <p>${name},</p>
-    <p>You have succesfully registered for the event <b>${event}</b> at Aurora'20, ABV-IIITM Gwalior.</p>
+    <p>You have successfully registered for the event <b>${event}</b> at Aurora'20, ABV-IIITM Gwalior.</p>
     <p>
       <b>Order Summery:</b><br />
       <table style="width: 90%; margin-left: 5%; border: 1px solid black; border-collapse: collapse; text-align: center;">
@@ -37,7 +37,7 @@ const getEvtEmail = (name, email, event, receipt, amount) => {
   const text = `
 ${name},
 
-You have succesfully registered for the event ${event} at Aurora'20.
+You have successfully registered for the event ${event} at Aurora'20.
 
 Order summary:
 Event Name    - Amount - Receipt ID

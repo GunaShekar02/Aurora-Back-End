@@ -18,7 +18,7 @@ const eventOrders = async (_, args, context) => {
       ['orderId', 'orderId'],
     ]);
 
-    const filter = status ? { status } : {};
+    const filter = status && status !== 'all' ? { status } : {};
     if (filterBy && pattern && availableFilters.has(filterBy)) {
       filter[availableFilters.get(filterBy)] = new RegExp(pattern, 'i');
     }
@@ -40,7 +40,7 @@ const eventOrders = async (_, args, context) => {
         },
       ])
       .toArray();
-    total = total[0].orders;
+    total = total[0] ? total[0].orders : 0;
 
     const orderArray = await db
       .collection('orders')
