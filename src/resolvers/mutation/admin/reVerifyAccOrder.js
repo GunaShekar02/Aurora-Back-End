@@ -34,6 +34,9 @@ const reVerifyAccOrder = async (_, args, context) => {
 
     const users = await userLoader.loadMany(order.users);
 
+    const gotAcc = users.some(u => u.accommodation);
+    if (gotAcc) throw new ApolloError('Some user(s) already got Accomodation', 'ALREADY_PAID');
+
     const fullUsers = [];
     const hundredUsers = [];
     const fiftyUsers = [];

@@ -35,6 +35,10 @@ const reVerifyEvtOrder = async (_, args, context) => {
     if (!payment) throw new ApolloError('No valid payment found', 'NO_PAYMENT');
 
     const teams = await teamLoader.loadMany(order.teams);
+
+    const gotEvt = teams.some(t => t.paymentStatus);
+    if (gotEvt) throw new ApolloError('Some event is already paid', 'ALREADY_PAID');
+
     const userMap = new Map();
     for (let i = 0; i < teams.length; i += 1) {
       const team = teams[i];
