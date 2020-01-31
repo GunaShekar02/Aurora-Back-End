@@ -1,5 +1,5 @@
 const { AuthenticationError, ApolloError } = require('apollo-server-express');
-const { canEditUsers } = require('../../../utils/roles');
+const { canEditUsers, canViewSomeEvents } = require('../../../utils/roles');
 
 const makeEventAdmin = async (_, args, context) => {
   const { isValid, id, userLoader, db } = context;
@@ -12,7 +12,7 @@ const makeEventAdmin = async (_, args, context) => {
 
     if (!user) throw new ApolloError('User does not exist', 'USR_DOESNT_EXIST');
 
-    if (user.role && user.role.isEventAdmin) {
+    if (user.role && (await canViewSomeEvents(arId, userLoader))) {
       const eventsToInsert = eventIds.filter(eId => !user.role.events.some(evtId => evtId === eId));
       db.collection('users').updateOne(
         { _id: arId },
@@ -21,7 +21,7 @@ const makeEventAdmin = async (_, args, context) => {
     } else {
       db.collection('users').updateOne(
         { _id: arId },
-        { $set: { 'role.events': eventIds, 'role.isEventAdmin': true } }
+        { $set: { 'role.events': eventIds }, $push: { roles: 'evtHead' } }
       );
     }
     return {
