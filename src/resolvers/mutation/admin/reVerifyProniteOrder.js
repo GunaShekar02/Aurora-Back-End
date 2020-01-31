@@ -34,6 +34,9 @@ const reVerifyEvtOrder = async (_, args, context) => {
 
     const users = await userLoader.loadMany(order.users);
 
+    const gotPronite = users.some(u => u.pronite.paid);
+    if (gotPronite) throw new ApolloError('Some user(s) already got Pronite', 'ALREADY_PAID');
+
     // Fetch all reams beforehand to avoid multiple requests
     const allTeams = users.reduce((acc, cur) => acc.concat(cur.teams.map(team => team.teamId)), []);
     await teamLoader.loadMany(allTeams);
