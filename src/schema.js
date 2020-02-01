@@ -5,6 +5,7 @@ const typeDefs = gql`
     user: User!
     publicUser(arId: String!): PublicUser
     publicUsers(arIds: [String!]!): [PublicUser]!
+    caUsers: [PublicUser!]
     allUsers(
       limit: Int
       page: Int

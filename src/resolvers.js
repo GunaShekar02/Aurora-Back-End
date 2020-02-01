@@ -1,6 +1,7 @@
 const user = require('./resolvers/query/user');
 const publicUser = require('./resolvers/query/publicUser');
 const publicUsers = require('./resolvers/query/publicUsers');
+const caUsers = require('./resolvers/query/caUsers');
 
 const allUsers = require('./resolvers/query/protected/allUsers');
 const allTeams = require('./resolvers/query/protected/allTeams');
@@ -55,6 +56,7 @@ const resolvers = {
     user,
     publicUser,
     publicUsers,
+    caUsers,
     allUsers,
     allTeams,
     eventTeams,
