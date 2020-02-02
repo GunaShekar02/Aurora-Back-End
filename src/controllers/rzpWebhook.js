@@ -5,6 +5,9 @@ const getReverifyInfoEmail = require('../utils/emails/reverifyInfo');
 const checkOrder = async (data, db) => {
   if (data.event === 'order.paid') {
     const payment = data.payload.payment.entity;
+
+    console.log('[WEBHOOK] verifying: orderId=>', payment.order_id);
+
     let order;
 
     order = await db.collection('orders').findOne({ orderId: payment.order_id });
@@ -33,7 +36,7 @@ const checkOrder = async (data, db) => {
               )
             );
         } else {
-          console.log('order not found in database, data=>', data);
+          console.log('[WEBHOOK] order not found in database, data=>', data);
         }
       }
     }
@@ -41,6 +44,7 @@ const checkOrder = async (data, db) => {
 };
 
 const rzpWebhook = (req, res, db) => {
+  console.log('[WEBHOOK] got request');
   const data = req.body;
   const signature = req.headers['x-razorpay-signature'];
 
@@ -53,7 +57,7 @@ const rzpWebhook = (req, res, db) => {
   if (isValid) {
     setTimeout(() => {
       checkOrder(data, db);
-    }, 10000);
+    }, 20000);
   }
 
   res.status(200).json('got it');
