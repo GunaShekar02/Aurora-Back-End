@@ -1,9 +1,9 @@
-const getInfoAccEmail = (arId, name, email, orderId, amount) => {
+const getReverifyInfoEmail = (orderId, amount, email, ctx) => {
   const prefix = process.env.NODE_ENV === 'production' ? `` : `[STAGING] `;
   const html = `<html lang="en">
   <head><meta charset="UTF-8"></head>
   <body style="font-family: Helvetica, serif;">
-    <p>Payment done by <b>${name}</b> (${arId} - ${email}) for accommodation.</p>
+    <p>Payment done by <b>${email}</b> for ${ctx}, but it is not verified.</p>
     <p>
       OrderID: <b>${orderId}</b><br />
       Amount: <b>${amount}</b>
@@ -14,7 +14,7 @@ const getInfoAccEmail = (arId, name, email, orderId, amount) => {
 </html>
 `;
   const text = `
-Payment done by ${name} (${arId} - ${email}) for accommodation.
+Payment done by <b>${email}</b> for ${ctx}, but it is not verified.
 
 OrderID: ${orderId}
 Amount: ${amount}
@@ -26,9 +26,10 @@ ABV-IIITM, Gwalior, Madhya Pradesh, 474015
     html,
     text,
     to: 'prem@aurorafest.org, kushwaha@aurorafest.org',
+    cc: 'prmsrswt@gmail.com',
     from: 'Aurora <admin@aurorafest.org>',
-    subject: `${prefix}Accommodation Payment at AuroraFest.org`,
+    subject: `${prefix}Re-Verify Payment at AuroraFest.org`,
   };
 };
 
-module.exports = getInfoAccEmail;
+module.exports = getReverifyInfoEmail;

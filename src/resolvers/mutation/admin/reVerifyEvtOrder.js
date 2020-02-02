@@ -145,10 +145,10 @@ const reVerifyEvtOrder = async (_, args, context) => {
       logger('[VERIFY_ORDER]', '[TRX_ERR]', err);
       throw new ApolloError('Something went wrong', 'TRX_FAILED');
     } finally {
-      const payUser = await userLoader.load(id);
+      const payUser = await userLoader.load(order.paidBy);
       teams.forEach(t => {
         const { name, fee } = eventMap.get(t.event);
-        mailer(getInfoEvtEmail(id, payUser.name, payUser.email, name, fee, t._id));
+        mailer(getInfoEvtEmail(order.paidBy, payUser.name, payUser.email, name, fee, t._id));
       });
 
       users.forEach(user => {
