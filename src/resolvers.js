@@ -11,6 +11,7 @@ const proniteOrders = require('./resolvers/query/protected/proniteOrders');
 const accOrders = require('./resolvers/query/protected/accOrders');
 const adminMetadata = require('./resolvers/query/protected/adminMetadata');
 const stats = require('./resolvers/query/protected/stats');
+const allCA = require('./resolvers/query/protected/allCA');
 
 const signup = require('./resolvers/mutation/signup');
 const alphaSignup = require('./resolvers/mutation/alphaSignup');
@@ -65,6 +66,7 @@ const resolvers = {
     accOrders,
     adminMetadata,
     stats,
+    allCA,
   },
   Mutation: {
     signup,

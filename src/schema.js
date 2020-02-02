@@ -59,6 +59,14 @@ const typeDefs = gql`
       pattern: String
       status: String
     ): OrderRes
+    allCA(
+      limit: Int
+      page: Int
+      sortBy: String
+      sortDir: Int
+      filterBy: String
+      pattern: String
+    ): CAQueryRes
     adminMetadata: AdminRes
     stats: StatRes
   }
@@ -80,6 +88,16 @@ const typeDefs = gql`
   type OrderRes {
     total: Int!
     orders: [Order!]
+  }
+
+  type CAQueryRes {
+    total: Int!
+    ca: [CARes!]
+  }
+
+  type CARes {
+    paidUsers: [User!]
+    user: User!
   }
 
   type AdminRes {
