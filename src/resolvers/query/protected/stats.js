@@ -58,8 +58,12 @@ const stats = async (_, __, context) => {
         },
         {
           $match: {
-            'teamList.paymentStatus': true,
-            'teamList.event': { $nin: [15, 17, 18, 21, 22, 29] },
+            teamList: {
+              $elemMatch: {
+                paymentStatus: true,
+                event: { $nin: [15, 17, 18, 21, 22, 29] },
+              },
+            },
           },
         },
         {

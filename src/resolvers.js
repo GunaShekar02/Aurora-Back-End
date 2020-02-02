@@ -1,6 +1,7 @@
 const user = require('./resolvers/query/user');
 const publicUser = require('./resolvers/query/publicUser');
 const publicUsers = require('./resolvers/query/publicUsers');
+const caUsers = require('./resolvers/query/caUsers');
 
 const allUsers = require('./resolvers/query/protected/allUsers');
 const allTeams = require('./resolvers/query/protected/allTeams');
@@ -10,6 +11,7 @@ const proniteOrders = require('./resolvers/query/protected/proniteOrders');
 const accOrders = require('./resolvers/query/protected/accOrders');
 const adminMetadata = require('./resolvers/query/protected/adminMetadata');
 const stats = require('./resolvers/query/protected/stats');
+const allCA = require('./resolvers/query/protected/allCA');
 
 const signup = require('./resolvers/mutation/signup');
 const alphaSignup = require('./resolvers/mutation/alphaSignup');
@@ -55,6 +57,7 @@ const resolvers = {
     user,
     publicUser,
     publicUsers,
+    caUsers,
     allUsers,
     allTeams,
     eventTeams,
@@ -63,6 +66,7 @@ const resolvers = {
     accOrders,
     adminMetadata,
     stats,
+    allCA,
   },
   Mutation: {
     signup,

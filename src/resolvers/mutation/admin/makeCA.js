@@ -11,9 +11,10 @@ const makeCA = async (_, args, context) => {
 
     if (!user) throw new ApolloError('User does not exist', 'USR_DOESNT_EXIST');
 
-    if (!user.ca.isCA) {
-      db.collection('users').updateOne({ _id: arId }, { $set: { 'ca.isCA': true } });
-    }
+    if (user.ca.isCA) throw new ApolloError('User is already a CA', 'USR_IS_CA');
+
+    db.collection('users').updateOne({ _id: arId }, { $set: { 'ca.isCA': true } });
+
     return {
       success: true,
       message: 'User is now Campus Ambassador',
