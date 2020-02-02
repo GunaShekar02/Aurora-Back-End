@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const bodyParser = require('body-parser');
+
 const { MongoClient } = require('mongodb');
 const { ApolloServer } = require('apollo-server-express');
 
@@ -7,10 +9,13 @@ const typeDefs = require('./schema');
 const resolvers = require('./resolvers');
 const provideContext = require('./context');
 
+const rzpWebhook = require('./controllers/rzpWebhook');
+
 const config = require('./utils/config');
 
 const app = express();
 app.use(cors());
+app.use(bodyParser.json());
 
 MongoClient.connect(config.dbHost, {
   auth: {
@@ -35,6 +40,9 @@ MongoClient.connect(config.dbHost, {
     const port = config.port || 3001;
 
     app.get('/api', (_req, res) => res.send('it is working.'));
+    app.post('/api/rzpwebhook', (req, res) => {
+      rzpWebhook(req, res, db);
+    });
 
     server.applyMiddleware({ app, path: '/api/graphql' });
 

@@ -1,7 +1,7 @@
 const getInfoProEmail = (arId, name, email, orderId, amount) => {
   const prefix = process.env.NODE_ENV === 'production' ? `` : `[STAGING] `;
   const html = `<html lang="en">
-  <meta charset="UTF-8">
+  <head><meta charset="UTF-8"></head>
   <body style="font-family: Helvetica, serif;">
     <p>Payment done by <b>${name}</b> (${arId} - ${email}) for pronite.</p>
     <p>

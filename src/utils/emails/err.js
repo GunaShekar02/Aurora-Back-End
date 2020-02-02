@@ -1,6 +1,6 @@
 const getErrEmail = (title, error) => {
   const html = `<html lang="en">
-  <meta charset="UTF-8">
+  <head><meta charset="UTF-8"></head>
   <body style="font-family: Helvetica, serif;">
     <p><b>${title}</b></p>
     <p><pre><code>${error}</code></pre></p>
