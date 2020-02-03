@@ -1,10 +1,10 @@
 const { AuthenticationError } = require('apollo-server-express');
-const { canViewUsers } = require('../../../utils/roles');
+const { canViewCA } = require('../../../utils/roles');
 
-const allUsers = async (_, args, context) => {
+const allCA = async (_, args, context) => {
   const { id, userLoader, isValid, db } = context;
 
-  if (isValid && (await canViewUsers(id, userLoader))) {
+  if (isValid && (await canViewCA(id, userLoader))) {
     const { filterBy, pattern } = args;
     const limit = args.limit || 99999;
     const page = args.page || 0;
@@ -124,4 +124,4 @@ const allUsers = async (_, args, context) => {
   throw new AuthenticationError('Go Home Kid');
 };
 
-module.exports = allUsers;
+module.exports = allCA;
