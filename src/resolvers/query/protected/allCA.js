@@ -46,31 +46,46 @@ const allCA = async (_, args, context) => {
             from: 'teams',
             localField: 'user.teams.teamId',
             foreignField: '_id',
-            as: 'teamList',
+            as: 'user.teamList',
           },
         },
         {
-          $match: {
-            $or: [
-              {
-                'user.pronite.paid': true,
-              },
-              {
-                teamList: {
-                  $elemMatch: {
-                    paymentStatus: true,
-                    event: {
-                      $nin: [15, 17, 18, 21, 22, 29],
-                    },
-                  },
+          $project: {
+            timeSt: 1,
+            name: 1,
+            college: 1,
+            email: 1,
+            'user._id': 1,
+            'user.pronite': 1,
+            'user.teamList': {
+              $filter: {
+                input: '$user.teamList',
+                as: 'team',
+                cond: {
+                  $eq: ['$$team.paymentStatus', true],
                 },
               },
-              {
-                user: {
-                  $exists: false,
+            },
+          },
+        },
+        {
+          $project: {
+            timeSt: 1,
+            name: 1,
+            college: 1,
+            email: 1,
+            'user._id': 1,
+            'user.pronite': 1,
+            'user.teamList': 1,
+            'user.teamSize': {
+              $reduce: {
+                input: '$user.teamList',
+                initialValue: 0,
+                in: {
+                  $add: ['$$value', 1],
                 },
               },
-            ],
+            },
           },
         },
         {
@@ -85,17 +100,35 @@ const allCA = async (_, args, context) => {
             name: {
               $first: '$name',
             },
-            email: {
-              $first: '$email',
-            },
-            city: {
-              $first: '$city',
-            },
             college: {
               $first: '$college',
             },
-            phone: {
-              $first: '$phone',
+            email: {
+              $first: '$email',
+            },
+          },
+        },
+        {
+          $project: {
+            timeSt: 1,
+            name: 1,
+            college: 1,
+            email: 1,
+            users: {
+              $filter: {
+                input: '$users',
+                as: 'user',
+                cond: {
+                  $or: [
+                    {
+                      $eq: ['$$user.pronite.paid', true],
+                    },
+                    {
+                      $gt: ['$$user.teamSize', 0],
+                    },
+                  ],
+                },
+              },
             },
           },
         },
