@@ -79,6 +79,24 @@ const allUsers = async (_, args, context) => {
             users: {
               $push: '$user',
             },
+            timeSt: {
+              $first: '$timeSt',
+            },
+            name: {
+              $first: '$name',
+            },
+            email: {
+              $first: '$email',
+            },
+            city: {
+              $first: '$city',
+            },
+            college: {
+              $first: '$college',
+            },
+            phone: {
+              $first: '$phone',
+            },
           },
         },
         { $sort: { [sortBy]: sortDir } },
