@@ -232,11 +232,11 @@ const data = [
     {
       id: 20,
       name: 'Morning Radio',
-      fee: 200,
+      fee: 100,
       isNameRequired: false,
       maxSize: 1,
       parentEvent: 'a-lit',
-      hasOffer: 'hundred',
+      hasOffer: 'fifty',
     },
   ],
   [
