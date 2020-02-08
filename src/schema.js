@@ -69,6 +69,7 @@ const typeDefs = gql`
     ): CAQueryRes
     adminMetadata: AdminRes
     stats: StatRes
+    userDetails(arId: String!): User!
   }
 
   type UserQueryRes {
