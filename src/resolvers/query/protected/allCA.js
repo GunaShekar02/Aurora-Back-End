@@ -138,7 +138,7 @@ const allCA = async (_, args, context) => {
       ])
       .toArray();
 
-    const ca = userRes.map(user => {
+    const caUsers = userRes.map(user => {
       return {
         paidUsers: user.users.map(u => {
           return { id: u._id };
@@ -151,7 +151,7 @@ const allCA = async (_, args, context) => {
 
     return {
       total,
-      ca,
+      caUsers,
     };
   }
   throw new AuthenticationError('Go Home Kid');
