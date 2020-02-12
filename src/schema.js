@@ -93,7 +93,7 @@ const typeDefs = gql`
 
   type CAQueryRes {
     total: Int!
-    ca: [CARes!]
+    caUsers: [CARes!]
   }
 
   type CARes {
