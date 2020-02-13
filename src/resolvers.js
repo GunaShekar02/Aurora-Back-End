@@ -46,6 +46,7 @@ const impersonate = require('./resolvers/mutation/admin/impersonate');
 const reVerifyEvtOrder = require('./resolvers/mutation/admin/reVerifyEvtOrder');
 const reVerifyProniteOrder = require('./resolvers/mutation/admin/reVerifyProniteOrder');
 const reVerifyAccOrder = require('./resolvers/mutation/admin/reVerifyAccOrder');
+const issueBand = require('./resolvers/mutation/admin/issueBand');
 
 const User = require('./resolvers/custom/User');
 const PublicUser = require('./resolvers/custom/PublicUser');
@@ -101,6 +102,7 @@ const resolvers = {
     reVerifyEvtOrder,
     reVerifyProniteOrder,
     reVerifyAccOrder,
+    issueBand,
   },
   User,
   PublicUser,

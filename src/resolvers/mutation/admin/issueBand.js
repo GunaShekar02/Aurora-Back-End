@@ -13,33 +13,31 @@ const getBandType = async (user, teamLoader) => {
 
   return 'none';
 };
-const bandTypes = ['acc', 'pro', 'evt'];
+// const bandTypes = ['acc', 'pro', 'evt'];
 
-const userDetails = async (_, args, context) => {
-  const { id, userLoader, teamLoader, isValid } = context;
+const issueBand = async (_, args, context) => {
+  const { isValid, id, userLoader, teamLoader, db } = context;
 
   if (isValid && ((await canViewEvents(id, userLoader)) || (await canViewUsers(id, userLoader)))) {
-    const { arId } = args;
+    const arId = args.arId.toUpperCase();
 
     const user = await userLoader.load(arId);
 
-    if (!user) throw new ApolloError('Invalid User', 'INVALID_USER');
+    if (!user) throw new ApolloError('User does not exist', 'USR_DOESNT_EXIST');
 
-    const issuedBandType = user.band;
-    const isBandIssued = bandTypes.some(type => type === issuedBandType);
+    if (user.band !== 'none') throw new ApolloError('User already got a band', 'USR_GOT_BAND');
 
     const bandType = await getBandType(user, teamLoader);
 
+    db.collection('users').updateOne({ _id: arId }, { $set: { band: bandType } });
+
     return {
-      bandType,
-      issuedBandType,
-      isBandIssued,
-      user: {
-        id: arId,
-      },
+      success: true,
+      message: `User is issued a ${bandType} band`,
+      code: 200,
     };
   }
   throw new AuthenticationError('Go Home Kid');
 };
 
-module.exports = userDetails;
+module.exports = issueBand;

@@ -69,7 +69,14 @@ const typeDefs = gql`
     ): CAQueryRes
     adminMetadata: AdminRes
     stats: StatRes
-    userDetails(arId: String!): User!
+    userDetails(arId: String!): UserDetailRes
+  }
+
+  type UserDetailRes {
+    user: User!
+    bandType: String!
+    issuedBandType: String!
+    isBandIssued: Boolean!
   }
 
   type UserQueryRes {
@@ -271,6 +278,7 @@ const typeDefs = gql`
     updateProfile(name: String!, college: String!, city: String!, phone: String!): UserResponse
     uploadPhoto(photo: Upload!): UserResponse
     setCA(id: String!): UserResponse
+    issueBand(arId: String!): MutationResponse
   }
 
   type EventResponse {
