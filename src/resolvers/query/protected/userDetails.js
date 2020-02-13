@@ -1,4 +1,4 @@
-const { AuthenticationError } = require('apollo-server-express');
+const { AuthenticationError, ApolloError } = require('apollo-server-express');
 const { canViewEvents, canViewUsers } = require('../../../utils/roles');
 
 const getBandType = async (user, teamLoader) => {
@@ -22,6 +22,8 @@ const userDetails = async (_, args, context) => {
     const { arId } = args;
 
     const user = await userLoader.load(arId);
+
+    if (!user) throw new ApolloError('Invalid User', 'INVALID_USER');
 
     const issuedBandType = user.band;
     const isBandIssued = bandTypes.some(type => type === issuedBandType);
