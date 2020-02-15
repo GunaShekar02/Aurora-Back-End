@@ -64,6 +64,7 @@ const signup = async (_, args, context) => {
       teams: [],
       teamInvitations: [],
       timeSt: `${Date.now()}`,
+      band: 'none',
     };
     const token = `${arId.replace(/-/g, '')}${Math.floor(Math.random() * 899999 + 100000)}`;
     const hash = await bcrypt.hash(password, 10);

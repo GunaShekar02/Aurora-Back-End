@@ -60,6 +60,7 @@ const alphaSignup = async (_, args, context) => {
       teams: [],
       teamInvitations: [],
       timeSt: `${Date.now()}`,
+      band: 'none',
     };
     const password = arId.replace(/-/g, '').toLowerCase();
     const hash = await bcrypt.hash(password, 10);
