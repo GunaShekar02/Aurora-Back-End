@@ -44,9 +44,9 @@ const config = {
   },
   extraCharges: 2.42,
   accomodationFee: 799,
-  proniteFee: 349,
-  evtOfferAmount: 100,
-  smallEvtOfferAmount: 50,
+  proniteFee: 499,
+  evtOfferAmount: 0,
+  smallEvtOfferAmount: 0,
 };
 
 module.exports = config;

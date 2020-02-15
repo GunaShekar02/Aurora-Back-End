@@ -1,11 +1,11 @@
 const { ApolloError } = require('apollo-server-express');
-const { verifyRzpSignature, isEligibleForEvtRefund } = require('../../utils/helpers');
+const { verifyRzpSignature } = require('../../utils/helpers');
 const mailer = require('../../utils/mailer');
 const getProniteEmail = require('../../utils/emails/pronite');
 const getInfoProEmail = require('../../utils/emails/infoPronite');
 
 const verifyProniteOrder = async (_, args, context) => {
-  const { id, db, logger, client, rzp, userLoader, teamLoader } = context;
+  const { id, db, logger, client, rzp, userLoader } = context;
   const { orderId, paymentId, signature } = args;
 
   const isSignatureValid = verifyRzpSignature(orderId, paymentId, signature);
@@ -21,21 +21,21 @@ const verifyProniteOrder = async (_, args, context) => {
   const users = await userLoader.loadMany(order.users);
 
   // Fetch all reams beforehand to avoid multiple requests
-  const allTeams = users.reduce((acc, cur) => acc.concat(cur.teams.map(team => team.teamId)), []);
-  await teamLoader.loadMany(allTeams);
+  // const allTeams = users.reduce((acc, cur) => acc.concat(cur.teams.map(team => team.teamId)), []);
+  // await teamLoader.loadMany(allTeams);
 
-  const offerEligibleUsers = [];
-  const smallOfferEligibleUsers = [];
-  const notEligibleUsers = [];
+  // const offerEligibleUsers = [];
+  // const smallOfferEligibleUsers = [];
+  // const notEligibleUsers = [];
 
-  for (let i = 0; i < users.length; i += 1) {
-    // eslint-disable-next-line no-await-in-loop
-    const teams = await teamLoader.loadMany(users[i].teams.map(team => team.teamId));
-    const evtRefund = isEligibleForEvtRefund(users[i], teams);
-    if (evtRefund === 'hundred') offerEligibleUsers.push(users[i]);
-    else if (evtRefund === 'fifty') smallOfferEligibleUsers.push(users[i]);
-    else notEligibleUsers.push(users[i]);
-  }
+  // for (let i = 0; i < users.length; i += 1) {
+  //   // eslint-disable-next-line no-await-in-loop
+  //   const teams = await teamLoader.loadMany(users[i].teams.map(team => team.teamId));
+  //   const evtRefund = isEligibleForEvtRefund(users[i], teams);
+  //   if (evtRefund === 'hundred') offerEligibleUsers.push(users[i]);
+  //   else if (evtRefund === 'fifty') smallOfferEligibleUsers.push(users[i]);
+  //   else notEligibleUsers.push(users[i]);
+  // }
 
   const session = client.startSession({
     defaultTransactionOptions: {
@@ -63,49 +63,42 @@ const verifyProniteOrder = async (_, args, context) => {
       );
 
       const userRes = usersCollection.updateMany(
-        { _id: { $in: notEligibleUsers.map(u => u._id) } },
-        { $set: { 'pronite.paid': true, 'pronite.paidAmount': 349 } },
+        { _id: { $in: order.users } },
+        { $set: { 'pronite.paid': true, 'pronite.paidAmount': 499 } },
         { session }
       );
 
-      const userSmallEvtRes = usersCollection.updateMany(
-        { _id: { $in: smallOfferEligibleUsers.map(u => u._id) } },
-        {
-          $set: {
-            'pronite.paid': true,
-            'pronite.gotEvtOffer': 'fifty',
-            'pronite.paidAmount': 299,
-          },
-        },
-        { session }
-      );
+      // const userSmallEvtRes = usersCollection.updateMany(
+      //   { _id: { $in: smallOfferEligibleUsers.map(u => u._id) } },
+      //   {
+      //     $set: {
+      //       'pronite.paid': true,
+      //       'pronite.gotEvtOffer': 'fifty',
+      //       'pronite.paidAmount': 299,
+      //     },
+      //   },
+      //   { session }
+      // );
 
-      const userEvtRes = usersCollection.updateMany(
-        { _id: { $in: offerEligibleUsers.map(u => u._id) } },
-        {
-          $set: {
-            'pronite.paid': true,
-            'pronite.gotEvtOffer': 'hundred',
-            'pronite.paidAmount': 249,
-          },
-        },
-        { session }
-      );
+      // const userEvtRes = usersCollection.updateMany(
+      //   { _id: { $in: offerEligibleUsers.map(u => u._id) } },
+      //   {
+      //     $set: {
+      //       'pronite.paid': true,
+      //       'pronite.gotEvtOffer': 'hundred',
+      //       'pronite.paidAmount': 249,
+      //     },
+      //   },
+      //   { session }
+      // );
 
-      return Promise.all([orderRes, userRes, userSmallEvtRes, userEvtRes]);
+      // return Promise.all([orderRes, userRes, userSmallEvtRes, userEvtRes]);
+      return Promise.all([orderRes, userRes]);
     });
 
-    notEligibleUsers.forEach(u => {
-      mailer(getProniteEmail(u.name, u.email, u._id, order.receipt, 349));
-      mailer(getInfoProEmail(u._id, u.name, u.email, orderId, 349));
-    });
-    smallOfferEligibleUsers.forEach(u => {
-      mailer(getProniteEmail(u.name, u.email, u._id, order.receipt, 299));
-      mailer(getInfoProEmail(u._id, u.name, u.email, orderId, 299));
-    });
-    offerEligibleUsers.forEach(u => {
-      mailer(getProniteEmail(u.name, u.email, u._id, order.receipt, 249));
-      mailer(getInfoProEmail(u._id, u.name, u.email, orderId, 249));
+    users.forEach(u => {
+      mailer(getProniteEmail(u.name, u.email, u._id, order.receipt, 499));
+      mailer(getInfoProEmail(u._id, u.name, u.email, orderId, 499));
     });
   } catch (err) {
     logger('[VERIFY_ORDER]', '[TRX_ERR]', err);
