@@ -97,8 +97,8 @@ const verifyAccOrder = async (_, args, context) => {
     refund();
 
     users.forEach(u => {
-      mailer(getAccEmail(u.name, u.email, u._id, order.receipt, 799));
-      mailer(getInfoAccEmail(u._id, u.name, u.email, orderId, 799));
+      mailer(getAccEmail(u.name, u.email, u._id, order.receipt, 1599));
+      mailer(getInfoAccEmail(u._id, u.name, u.email, orderId, 1599));
     });
   } catch (err) {
     logger('[VERIFY_ORDER]', '[TRX_ERR]', err);

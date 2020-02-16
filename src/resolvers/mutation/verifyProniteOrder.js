@@ -64,7 +64,7 @@ const verifyProniteOrder = async (_, args, context) => {
 
       const userRes = usersCollection.updateMany(
         { _id: { $in: order.users } },
-        { $set: { 'pronite.paid': true, 'pronite.paidAmount': 499, 'pronite.backup': true } },
+        { $set: { 'pronite.paid': true, 'pronite.paidAmount': 799, 'pronite.backup': true } },
         { session }
       );
 
@@ -97,8 +97,8 @@ const verifyProniteOrder = async (_, args, context) => {
     });
 
     users.forEach(u => {
-      mailer(getProniteEmail(u.name, u.email, u._id, order.receipt, 499));
-      mailer(getInfoProEmail(u._id, u.name, u.email, orderId, 499));
+      mailer(getProniteEmail(u.name, u.email, u._id, order.receipt, 799));
+      mailer(getInfoProEmail(u._id, u.name, u.email, orderId, 799));
     });
   } catch (err) {
     logger('[VERIFY_ORDER]', '[TRX_ERR]', err);

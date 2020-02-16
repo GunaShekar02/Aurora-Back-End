@@ -49,8 +49,8 @@ const config = {
     key_secret: RZP_BK_KEY_SECRET,
   },
   extraCharges: 2.42,
-  accomodationFee: 799,
-  proniteFee: 499,
+  accomodationFee: 1599,
+  proniteFee: 799,
   evtOfferAmount: 0,
   smallEvtOfferAmount: 0,
 };
