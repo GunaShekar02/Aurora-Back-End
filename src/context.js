@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const DataLoader = require('dataloader');
 const { jwtSecret } = require('./utils/config');
 const logger = require('./utils/logger');
-const rzp = require('./razorpay');
+const razor = require('./razorpay');
 
 const { batchUsers } = require('./resolvers/custom/loaders/userLoader');
 const { batchTeams } = require('./resolvers/custom/loaders/teamLoader');
@@ -14,6 +14,8 @@ const provideContext = async (request, database, client) => {
   const eventLoader = new DataLoader(eventIds => batchEvents(eventIds, database, logger));
 
   const { req } = request;
+  const { rzp, rzpBackup } = razor;
+
   const payload = {
     isValid: false,
     token: null,
@@ -26,6 +28,7 @@ const provideContext = async (request, database, client) => {
     eventLoader,
     logger,
     rzp,
+    rzpBackup,
   };
   const authHeader = req.headers.authorization || null;
 

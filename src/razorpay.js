@@ -1,6 +1,8 @@
 const Razorpay = require('razorpay');
-const { rzpOptions } = require('./utils/config');
+const { rzpOptions, rzpBackupOptions } = require('./utils/config');
 
 const rzp = new Razorpay(rzpOptions);
 
-module.exports = rzp;
+const rzpBackup = new Razorpay(rzpBackupOptions);
+
+module.exports = { rzp, rzpBackup };

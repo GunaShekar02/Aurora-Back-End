@@ -1,6 +1,7 @@
 const { ApolloError, AuthenticationError } = require('apollo-server-express');
 const {
-  rzpOptions,
+  // rzpOptions,
+  rzpBackupOptions,
   extraCharges,
   proniteFee,
   evtOfferAmount,
@@ -9,7 +10,7 @@ const {
 const { generateReceipt, isEligibleForEvtRefund } = require('../../utils/helpers');
 
 const generateProniteOrder = async (_, args, context) => {
-  const { isValid, id, db, logger, userLoader, teamLoader, rzp } = context;
+  const { isValid, id, db, logger, userLoader, teamLoader, rzpBackup } = context;
   const userIds = args.userIds.map(user => user.toUpperCase());
   const uniqueUserIds = [...new Set(userIds)];
 
@@ -50,7 +51,7 @@ const generateProniteOrder = async (_, args, context) => {
 
       const finalAmount = Math.floor(totalAmount * 100 + totalAmount * extraCharges);
 
-      const orderData = await rzp.orders.create({
+      const orderData = await rzpBackup.orders.create({
         amount: `${finalAmount}`,
         currency: 'INR',
         payment_capture: '1',
@@ -83,6 +84,7 @@ const generateProniteOrder = async (_, args, context) => {
           amount: totalAmount,
           finalAmount,
           status: 'initiated',
+          backup: true,
           timeSt: orderData.created_at,
         });
       } catch (err) {
@@ -93,7 +95,7 @@ const generateProniteOrder = async (_, args, context) => {
       return {
         order_id: orderData.id,
         amount: `${finalAmount}`,
-        key: rzpOptions.key_id,
+        key: rzpBackupOptions.key_id,
       };
     }
     throw new ApolloError('Total amount for pronite cannot be 0', 'TOTAL_ZERO');

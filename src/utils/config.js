@@ -16,6 +16,8 @@ const {
   SMTP_PASS,
   RZP_KEY_ID,
   RZP_KEY_SECRET,
+  RZP_BK_KEY_ID,
+  RZP_BK_KEY_SECRET,
 } = process.env;
 
 const config = {
@@ -41,6 +43,10 @@ const config = {
   rzpOptions: {
     key_id: RZP_KEY_ID,
     key_secret: RZP_KEY_SECRET,
+  },
+  rzpBackupOptions: {
+    key_id: RZP_BK_KEY_ID,
+    key_secret: RZP_BK_KEY_SECRET,
   },
   extraCharges: 2.42,
   accomodationFee: 799,
