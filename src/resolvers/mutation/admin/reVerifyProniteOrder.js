@@ -5,7 +5,7 @@ const getInfoProEmail = require('../../../utils/emails/infoPronite');
 const { canEditPronites } = require('../../../utils/roles');
 
 const reVerifyEvtOrder = async (_, args, context) => {
-  const { isValid, id, db, rzp, client, userLoader, logger } = context;
+  const { isValid, id, db, rzpBackup, client, userLoader, logger } = context;
 
   if (isValid && (await canEditPronites(id, userLoader))) {
     const { orderId } = args;
@@ -18,8 +18,8 @@ const reVerifyEvtOrder = async (_, args, context) => {
 
     if (order.status === 'paid') throw new ApolloError('Order is already paid', 'ORDER_PAID');
 
-    const rzpOrder = await rzp.orders.fetch(orderId);
-    const paymentList = await rzp.orders.fetchPayments(orderId);
+    const rzpOrder = await rzpBackup.orders.fetch(orderId);
+    const paymentList = await rzpBackup.orders.fetchPayments(orderId);
 
     console.log(rzpOrder, paymentList);
 
@@ -79,7 +79,7 @@ const reVerifyEvtOrder = async (_, args, context) => {
 
         const userRes = usersCollection.updateMany(
           { _id: { $in: order.users } },
-          { $set: { 'pronite.paid': true, 'pronite.paidAmount': 499 } },
+          { $set: { 'pronite.paid': true, 'pronite.paidAmount': 499, 'pronite.backup': true } },
           { session }
         );
 

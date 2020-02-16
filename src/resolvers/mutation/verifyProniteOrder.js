@@ -5,7 +5,7 @@ const getProniteEmail = require('../../utils/emails/pronite');
 const getInfoProEmail = require('../../utils/emails/infoPronite');
 
 const verifyProniteOrder = async (_, args, context) => {
-  const { id, db, logger, client, rzp, userLoader } = context;
+  const { id, db, logger, client, rzpBackup, userLoader } = context;
   const { orderId, paymentId, signature } = args;
 
   const isSignatureValid = verifyRzpSignature(orderId, paymentId, signature);
@@ -14,7 +14,7 @@ const verifyProniteOrder = async (_, args, context) => {
   const order = await db.collection('proniteOrders').findOne({ orderId });
   if (!order) throw new ApolloError('OrderID does not exist', 'INVALID_ORDER');
 
-  const orderData = await rzp.orders.fetch(orderId);
+  const orderData = await rzpBackup.orders.fetch(orderId);
 
   logger('[VERIFY_PRO_ORDER]', 'orderData =>', orderData);
 
@@ -64,7 +64,7 @@ const verifyProniteOrder = async (_, args, context) => {
 
       const userRes = usersCollection.updateMany(
         { _id: { $in: order.users } },
-        { $set: { 'pronite.paid': true, 'pronite.paidAmount': 499 } },
+        { $set: { 'pronite.paid': true, 'pronite.paidAmount': 499, 'pronite.backup': true } },
         { session }
       );
 
