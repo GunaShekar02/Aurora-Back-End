@@ -26,6 +26,7 @@ const getProniteEmail = (name, email, arId, receipt, amount) => {
       </table>
     </p>
     <br />
+    <b>NOTE: Entry for Pronite closes at 6:00 pm</b>
     Thanks,<br />
     Team Aurora
     <br /><br /><hr />
