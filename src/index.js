@@ -1,9 +1,10 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-
+const pdf = require('html-pdf');
 const { MongoClient } = require('mongodb');
 const { ApolloServer } = require('apollo-server-express');
+const pdfTemplate = require('./template');
 
 const typeDefs = require('./schema');
 const resolvers = require('./resolvers');
@@ -43,7 +44,21 @@ MongoClient.connect(config.dbHost, {
     app.post('/api/rzpwebhook', (req, res) => {
       rzpWebhook(req, res, db);
     });
+    app.post('/create-pdf', (req, res) => {
+      console.log('came here', req.body);
+      console.log(pdfTemplate(req.body));
+      pdf.create(pdfTemplate(req.body), {}).toFile(`${__dirname}/result.pdf`, err => {
+        if (err) {
+          res.send(Promise.reject());
+        }
 
+        res.send(Promise.resolve());
+      });
+    });
+
+    app.get('/fetch-pdf', (req, res) => {
+      res.sendFile(`${__dirname}/result.pdf`);
+    });
     server.applyMiddleware({ app, path: '/api/graphql' });
 
     app.listen(port, () =>
